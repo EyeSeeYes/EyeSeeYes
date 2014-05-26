@@ -1,0 +1,137 @@
+//The "PersonRecord" class.
+
+/**
+ * The class that stores and formats all of the records.
+ * @author Ms.Dyke, edited by Angela Jeong
+ * @version 2.1, Mar 20, 2014
+ */
+public class PersonRecord
+{
+  /**
+   * The strings that store the first name, last name, email and phone number.
+   */
+  private String first, last, email, phone;
+  /**
+   * The integer that stores the total number of records.
+   */
+  static int total = 0;
+  
+  /**
+   * A class constructor - stores first name, last name, email, and phone number.
+   * @param first String
+   * @param last String
+   * @param email String
+   * @param phone String
+   */
+  public PersonRecord (String first, String last, String email, String phone)
+  {
+    this.first = first;
+    this.last = last;
+    this.email = email;
+    this.phone = phone;
+    total++;
+  }
+  
+  /**
+   * A class constructor - stores first name, last name, and phone number.
+   * @param first String
+   * @param last String
+   * @param phone String
+   */
+  public PersonRecord (String first, String last, String phone)
+  {
+    this.first = first;
+    this.last = last;
+    this.phone = phone;
+    total++;
+  }
+  
+  /**
+   * A class constructor - stores first name and phone number.
+   * @param first String
+   * @param phone String
+   */
+  public PersonRecord (String first, String phone)
+  {
+    this.first = first;
+    this.phone = phone;
+    total++;
+  }
+  
+  /**
+   * A class constructor - stores phone number.
+   * @param phone String
+   */
+  public PersonRecord (String phone)
+  {
+    this.phone = phone;
+    total++;
+  }
+  
+  /**
+   * A class constructor.
+   * @param none
+   */
+  public PersonRecord ()
+  {
+    total++;
+  }
+  
+  public void setFirst (String newName)
+  {
+    first = formatName(newName);
+  }
+  
+  public void setLast (String newName)
+  {
+    last = formatName(newName);
+  }
+  
+  public void setEmail (String email)
+  {
+    email = email;
+  }
+  
+  public void setPhone (String newPhone)
+  {
+    phone = formatPhone(newPhone);
+  }
+  
+  public String getFirst()
+  {
+    return first;
+  }
+  
+  public String getLast()
+  {
+    return last;
+  }
+  
+  public String getEmail()
+  {
+    return email;
+  }
+  
+  public String getPhone()
+  {
+    return phone;
+  }
+  
+  private String formatName (String name)
+  {
+    String newName = "";
+    String splitName[] = name.split(" ");
+    
+    for (int i=0; i<splitName.length; i++)
+      newName += splitName[i].substring(0,1).toUpperCase() + splitName[i].substring(1).toLowerCase() + " ";
+    
+    return newName.substring(0,newName.length()-1);
+  }
+  
+  private String formatPhone (String phone)
+  {
+    phone = phone.replaceAll(" ","").replaceAll("-","");
+    return phone.substring(0,3) + "-" + phone.substring(3,6) + "-" + phone.substring(6);
+  }
+  
+}

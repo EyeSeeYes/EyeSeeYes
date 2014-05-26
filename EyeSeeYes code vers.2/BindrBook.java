@@ -1,0 +1,720 @@
+//The "BindrBook" class.
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.JToolBar;
+import javax.swing.JFrame;
+import javax.swing.table.*;
+import java.util.*;
+import java.io.*;
+
+/**
+ * The class that handles most of the data and manipulation thereof. <p>
+ * Creates a JPanel with buttons and text fields inside. <p>
+ * The user can interact with the buttons and text fields to create, edit, delete, and move between records. <p>
+ * @author Ms.Dyke, edited by Angela Jeong
+ * @version 6.0, May 14, 2014
+ */
+public class BindrBook extends JPanel implements ActionListener
+{
+  /**
+   * The array list that stores all the records
+   */
+  ArrayList <StudentRecord> students = new ArrayList <StudentRecord> ();
+  /**
+   * The integer that represents the current record number.
+   */
+  static int currentRecord = -1;
+  /**
+   * The action command for the "Previoius" button.
+   */
+  static final private String PREVIOUS = "previous";
+  
+  static final private String NEW = "new";
+  /**
+   * The action command for the "Submit" button.
+   */
+  static final private String SUBMIT = "submit";
+  /**
+   * The action command for the "Delete" button.
+   */
+  static final private String DELETE = "delete";
+  /**
+   * The action command for the "Next" button.
+   */
+  static final private String NEXT = "next";
+  /**
+   * The text field which will receive input for the first name.
+   */
+  JTextField firstText;
+  /**
+   * The text field which will receive input or the last name.
+   */
+  JTextField lastText;
+  
+  /**
+   * The text field which will receive input for the time.
+   */
+  JTextField timeText;
+  /**
+   * The text field which will receive input for the reason number.
+   */
+  JTextField reasonText;
+  /**
+   * The label which will display the current record number and the total record number.
+   */
+  JLabel currentLabel = new JLabel ("0 of 0");
+  /**
+   * The file that the program currently has opened.
+   */
+  File currentFile = new File("Untitled");
+  /**
+   * The boolean that checks whether the current data has been saved to a file.
+   */
+  boolean isSaved = true;
+  boolean currentLayout = true;
+  
+  JTable table;
+  DefaultTableModel model;
+  static JScrollPane scroll;
+  String[][] dataValues;
+  
+  /**
+   * The class constructor - Sets up the panel and tool bar and adds them to this JPanel.
+   * <p>
+   * @param none
+   */
+  public BindrBook()
+  {
+    makeBook();
+  }
+  
+  /**
+   * Creates the first panel, containing the address book.
+   * <p>
+   * Variables: <p>
+   * toolBar - JToolBar - The tool bar containing buttons the user can use to save, delete, and move between records. <p>
+   * p - JPanel - The JPanel containing textfields and labels to store and display records. <p>
+   * firstText - JTextField - The textfield in which the first name will be entered and displayed. <p>
+   * lastText - JTextField - The textfield in which the last name will be entered and displayed. <p>
+   * timeText - JTextField - The textfield in which the time will be entered and displayed. <p>
+   * reasonText - JTextField - The textfield in which the reason number will be entered and displayed. <p>
+   * firstLabel - JLabel - The label that labels the first name text field for the user. <p>
+   * lastLabel - JLabel - The label that labels the last name text field for the user. <p>
+   * timeLabel - JLabel - The label that labels the time text field for the user. <p>
+   * reasonLabel - JLabel - The label that labels the reason number text field for the user. <p>
+   * <p>
+   * Blocks: <p>
+   * Block 1: Creates a new BorderLayout to store the JPanel and JToolBar in. <p>
+   * Block 2: Creates a new tool bar, creates a layout for it and adds buttons to it. <p>
+   * Block 3: Creates a new panel and  creates a layout for it. <p>
+   * Block 4: Creates the text fields to receive user input and dispay output. <p>
+   * Block 5: Creates labels to label each text field. <p>
+   * Block 6: Adds each label and text field to the panel. <p>
+   * Block 7: Adds the tool bar and panel to this program. 
+   * <p>
+   * @param none
+   */
+  public void makeBook ()
+  {
+    setLayout (new BorderLayout ());
+    
+    JToolBar toolBar = new JToolBar ("Still draggable");
+    toolBar.setLayout (new FlowLayout (FlowLayout.CENTER));
+    addButtons (toolBar);
+    
+    JPanel p = new JPanel();
+    p.setLayout(new BoxLayout (p, BoxLayout.PAGE_AXIS));
+    
+    firstText = new JTextField ();
+    lastText = new JTextField ();
+    timeText = new JTextField ();
+    reasonText = new JTextField ();
+    
+    JLabel firstLabel = new JLabel ("First Name:");
+    JLabel lastLabel = new JLabel ("Last Name:");
+    JLabel timeLabel = new JLabel ("Time:");
+    JLabel reasonLabel = new JLabel ("Reason:");
+    
+    p.add(firstLabel);
+    p.add(firstText);
+    p.add(lastLabel);
+    p.add(lastText);
+    p.add(timeLabel);
+    p.add(timeText);
+    p.add(reasonLabel);
+    p.add(reasonText);
+    p.add(currentLabel);
+    
+    add (toolBar, BorderLayout.PAGE_END);
+    add (p, BorderLayout.CENTER);
+    
+    currentLayout = true;
+    displayBook();
+  }
+  
+  /**
+   * Adds buttons to the tool bar.
+   * <p>
+   * Blocks: <p>
+   * Block 1: Creates an empty JButton variable to be used while making and adding buttons. <p>
+   * Block 2: Creates the "Back" button that takes the user to the previous record when selected and adds it to the toolbar. <p>
+   * Block 3: Creates the "Submit" button that submits the current record when selected and adds it to the toolbar. <p>
+   * Block 4: Creates the "Delete" button that deletes the current record when selected and adds it to the toolbar. <p>
+   * Block 5: Creates the "Forward" button that takes the user to the next record when selected and adds it to the toolbar. 
+   * <p>
+   * @param toolBar JToolBar
+   */
+  protected void addButtons (JToolBar toolBar)
+  {
+    JButton button = null;
+    
+    button = makeButton ("Back", PREVIOUS, "Back to previous record");
+    toolBar.add (button);
+    
+    button = makeButton ("New", NEW, "Create a new record");
+    toolBar.add (button);
+    
+    button = makeButton ("Submit", SUBMIT, "Submits a record");
+    toolBar.add (button);
+    
+    button = makeButton ("Delete", DELETE, "Delete record");
+    toolBar.add (button);
+    
+    button = makeButton ("Forward", NEXT, "Forward to next record");
+    toolBar.add (button);
+  }
+  
+  /**
+   * Creates buttons for the tool bar.
+   * <p>
+   * Variables: <p>
+   * imageGIF - Image - The image used for the button's icon. <p>
+   * button - JButton - The button that is returned at the end of the method, to be added to the tool bar.
+   * <p>
+   * Blocks: <p>
+   * Block 1: Creates the image that will be used as the button's icon and the button itself. <p>
+   * Block 2: Sets the button's tool tip text, icon, action command, and adds an action listener. <p>
+   * Block 3: Returns the finished button.
+   * <p>
+   * @param imageName String
+   * @param actionCommand String
+   * @param toolTipText String
+   */
+  protected JButton makeButton (String imageName, String actionCommand, String toolTipText)
+  {
+    Image imageGIF = Toolkit.getDefaultToolkit ().getImage ("Graphics/" + imageName + ".gif");
+    JButton button = new JButton ();
+    
+    button.setToolTipText (toolTipText);
+    button.setIcon (new ImageIcon (imageGIF));
+    button.setActionCommand (actionCommand);
+    button.addActionListener (this);
+    
+    return button;
+  }
+  
+  public void makeTable ()
+  {
+    setLayout (new BorderLayout ());
+    
+    SString [] columnTitles = {"Period" , "Time" , "Name" , "In/Out/Absent" , "Reason"};
+    
+    model = new DefaultTableModel (dataValues, columnNames){
+      @Override
+      public boolean isCellEditable(int row, int column){
+        return column==0? false:true;
+      }};
+    
+    table = new JTable (model);
+    
+    table.setRowHeight (20);
+    table.setShowVerticalLines (true);
+    table.setShowHorizontalLines (true);
+    
+    table.setSelectionForeground (Color.green);
+    table.setSelectionBackground (Color.red);
+    table.setGridColor (Color.blue);
+    table.setVisible(true);
+    
+    table.getModel().addTableModelListener(new TableModelListener(){
+      @Override
+      public void tableChanged(TableModelEvent e) 
+      {
+        TableModel model = (TableModel)e.getSource();
+        int rNum = table.getSelectedRow();
+        
+        //need to edit based on what needs to be datachecked.
+        String first = (String)model.getValueAt(rNum,1);
+        String last = (String)model.getValueAt(rNum,2);
+        String time = (String)model.getValueAt(rNum,3);
+        
+        StudentRecord s = new StudentRecord(first,last,time,(String)model.getValueAt(rNum,4));
+        students.set(rNum,s);
+        
+        if(!first.isEmpty())
+          s.setFirst(first);
+        if (!last.isEmpty())
+          s.setLast(last);
+        if (!time.isEmpty())
+          s.setTime(time);
+      }});
+    
+    scroll = new JScrollPane (table);
+    add (scroll, BorderLayout.CENTER);
+    
+    currentLayout = false;
+  }
+  
+  
+  public void createData ()
+  {
+    dataValues = new String [students.size()] [5];
+    
+    for (int y = 0; y < students.size(); y++)
+    {
+      dataValues [y][0] = Integer.toString(y+1);
+      dataValues [y][1] = students.get(y).getFirst();
+      dataValues [y][2] = students.get(y).getLast();
+      dataValues [y][3] = students.get(y).getTime();
+      dataValues [y][4] = students.get(y).getReason();
+    }
+  }
+  
+  public void sort(int type, int field)
+  {
+    int[] array = new int[students.size()];
+    
+    if (type==1)
+      array = SortSearch.bubbleSort(field, dataValues);
+    else if (type==2)
+      array = SortSearch.insertionSort(field, dataValues);
+    else
+      array = SortSearch.selectionSort(field, dataValues);
+    
+    dataValues = new String [array.length][5];
+    for (int y=0; y<array.length; y++)
+    {
+      dataValues [y][0] = Integer.toString(array[y]+1);
+      dataValues [y][1] = students.get(array[y]).getFirst();
+      dataValues [y][2] = students.get(array[y]).getLast();
+      dataValues [y][3] = students.get(array[y]).getTime();
+      dataValues [y][4] = students.get(array[y]).getReason();
+    }
+  }
+  
+  
+  public void search(int type, int field, boolean isWhole, String match)
+  {
+    ArrayList<Integer> array = new ArrayList<>();
+    
+    System.out.println("in field is " + field);
+    System.out.println("in match is " + match);
+    
+    if (type==1)
+      array = SortSearch.sequentialSearch(field, isWhole, match, dataValues);
+    else
+      array = SortSearch.binarySearch(field, isWhole, match, dataValues);
+    System.out.println("in search array is " + array.size());
+    
+    dataValues = new String [array.size()][5];
+    for (int y=0; y<array.size(); y++)
+    {
+      dataValues [y][0] = Integer.toString(array.get(y)+1);
+      dataValues [y][1] = students.get(array.get(y)).getFirst();
+      dataValues [y][2] = students.get(array.get(y)).getLast();
+      dataValues [y][3] = students.get(array.get(y)).getTime();
+      dataValues [y][4] = students.get(array.get(y)).getReason();
+    }
+  }
+  
+  
+  public void saveTable()
+  {
+    StudentRecord s;
+    students.clear();
+    for (int i=0; i<dataValues.length; i++)
+    {
+      s = new StudentRecord (dataValues[i][1],dataValues[i][2],dataValues[i][3],dataValues[i][4]);
+      students.add(s);
+      
+      if (!dataValues[i][1].isEmpty())
+        s.setFirst(dataValues[i][1]);
+      if (!dataValues[i][2].isEmpty())
+        s.setLast(dataValues[i][2]);
+      if (!dataValues[i][3].isEmpty())
+        s.setTime(dataValues[i][3]);
+    }
+  }
+  
+  
+  private JFileChooser makeFileChooser(String fileName)
+  {
+    JFileChooser fc = new JFileChooser (".\\Files");
+    
+    fc.setFileSelectionMode (JFileChooser.FILES_ONLY);
+    fc.setFileFilter(new ExampleFileFilter("liek", "[Insert Unique File Header Here]"));
+    fc.setSelectedFile(new File(fileName));
+    
+    return fc;
+  }
+  
+  /**
+   * Creates a new file.
+   * <p>
+   * Variables: <p>
+   * confirm - int - The integer that stores the user's response to the confirm dialog
+   * <p>
+   * Blocks: <p>
+   * Block 1: An if structure that checks if the current data is saved to a file. <p>
+   * Block 2: If not, then a confirm dialog is displayed to the user asking if the user would like to save the current file before creating a new file. <p>
+   * Block 3: If the user selects "Yes", then the file is saved before creating a new file. <p>
+   * Block 4: If the user selects "No", then isSaved is set to true without actually saving the file and a new file is created. <p>
+   * Block 5: If the current data is saved to a file, then the current file is set to a non-existant "Untitled" file, <p>
+   * the array list containing all the data is cleared, the current record is set to -1 and the text fields are emptied.
+   * <p>
+   * @param none
+   */
+  public void newFile()
+  {
+    currentFile = new File("Untitled");
+    students.clear();
+    currentRecord = -1;
+  }
+  
+  /**
+   * Opens an existing file.
+   * <p>
+   * Variables: <p>
+   * confirm - int - The integer that stores the user's response to the confirm dialog. <p>
+   * fc - JFileChooser - The file chooser used to allow the user to select a file to open. <p>
+   * result - int - The integer that stores the user's response to the open dialog. <p>
+   * file - File - The file selected by the user. <p>
+   * name - String - The name of the selected file. <p>
+   * br - BufferedReader - The buffered reader to read the contents of the file. <p>
+   * t - int - The total number of records stored in the file. <p>
+   * e - IOException - The exception that may be thrown while reading the file.
+   * <p>
+   * @param none
+   */
+  public void openFile ()
+  {
+    JFileChooser fc = makeFileChooser(currentFile.getName().toString());
+    
+    int result = fc.showOpenDialog (this);
+    if (result == JFileChooser.APPROVE_OPTION)
+    {
+      File file = fc.getSelectedFile();
+      String name = file.getName();
+      
+      if (file == null || name.equals ("") || name.length () > 255)
+        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
+      
+      else if (!name.substring(name.length()-4).equalsIgnoreCase("liek"))
+        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
+      
+      else if (file.length()==0)
+        JOptionPane.showMessageDialog (this, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      
+      else
+      {
+        try
+        {
+          BufferedReader br = new BufferedReader (new FileReader (file));
+          
+          if (!br.readLine().equals("[Insert Unique File Header Here]"))
+            JOptionPane.showMessageDialog(this, "Invalid File Header", "Invalid File Header", JOptionPane.ERROR_MESSAGE);
+          
+          else
+          {
+            students.clear();
+            int t = Integer.parseInt(br.readLine());
+            
+            for (int i=0; i<t; i++)
+            {
+              StudentRecord p = new StudentRecord (br.readLine(),br.readLine(),br.readLine(),br.readLine());
+              students.add(i,p);
+            }
+            
+            currentFile = file;
+            currentRecord = 0;
+          }
+        }
+        
+        catch (IOException e)
+        {
+          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        catch (NumberFormatException e)
+        {
+          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+      }
+    }
+  }
+  
+  /**
+   * Saves the inputted data to the current file.
+   * <p>
+   * Variables: <p>
+   * confirm - int - Stores the user's response to the confirm dialog. <p>
+   * pw - PrintWriter - The file writer used to store data into the file. <p>
+   * e - IOException - The exception that may be thrown while storing data into the file.
+   * <p>
+   * Blocks: <p>
+   * Block 1: An if structure to check if there aren't any data stored into the array list. If so, then an error message is shown to the user. <p>
+   * Block 2: An else if structure that then checks if the current file is untitled. If so, then a confirm dialog is shown
+   * asking if the user would like to give the file a title. <p>
+   * Block 3: If the user selects the "Ok" option, then the saveAs method is called. <p>
+   * Block 4: Else, if there aren't any problems with the current file then a print writer is created inside a try-catch structure. <p>
+   * Block 5: The print writer first prints a header, then the number of records to be stored. <p>
+   * Block 6: Then it prints the data using a loop that runs for the number of records. <p>
+   * Block 7: The print writer is then closed and isSaved is set to true. <p>
+   * Block 8: If there were any exceptions thrown then it is caught and an error message is shown to the user.
+   * <p>
+   * @param none
+   */
+  public void saveFile(boolean isSaveAs, File fileName)
+  {
+    if (isSaveAs==false && currentFile.getName().equals("Untitled"))
+    {
+      int confirm = JOptionPane.showConfirmDialog (this, "This is an Untitled File. Give it a title?", "Untitled File", JOptionPane.OK_CANCEL_OPTION);
+      if (confirm == JOptionPane.OK_OPTION)
+        saveAs();
+    }
+    
+    else
+    {
+      try
+      {
+        PrintWriter pw = new PrintWriter (new FileWriter (fileName));
+        
+        pw.println("[Insert Unique File Header Here]");
+        pw.println(students.size());
+        
+        for (int i=0;i<students.size();i++)
+        {
+          pw.println(students.get(i).getFirst());
+          pw.println(students.get(i).getLast());
+          pw.println(students.get(i).getTime());
+          pw.println(students.get(i).getReason());
+        }
+        
+        pw.close();
+        isSaved = true;
+      }
+      
+      catch (IOException e)
+      {
+        JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+  
+  /**
+   * Saves the inputted data to a new or exisiting file.
+   * <p>
+   * Variables: <p>
+   * fc - JFileChooser - The file chooser used to allow the user to select a file to open. <p>
+   * result - int - The integer that stores the user's response to the open dialog. <p>
+   * file - File - The file selected by the user. <p>
+   * name - String - The name of the selected file. <p>
+   * pw - PrintWriter - The print writer used to store data into the file. <p>
+   * e - IOException - The exception that may be thrown while storing data into the file.
+   * <p>
+   * Blocks: <p>
+   * Block 1: An if structure that checks if the array list is empty. If so, then an error message is displayed to the user. <p>
+   * Block 2: Else, a JFileChooser is created in the folder containing all of the program's data files. <p>
+   * Block 3: The file chooser's file selection mode and filter are set to only display the wanted files. The suggested file title is set to "Untitled". <p>
+   * Block 4: The save dialog is shown and an integer variable stores the user input. <p>
+   * Block 5: An if structure checks if the user selected the approve option. 
+   * If so, the selected file is stored to a file variable and its name is stored as a string. <p>
+   * Block 6: An if structure checks if the file name is valid. If not, then an error message is diplayed to the user. <p>
+   * Block 7: Else, an if structure checks if the file extension is valid If not, then an error message is displayed to the user. <p>
+   * Block 8: Else, a print writer is created for the file in a try-catch structure. <p>
+   * Block 9: The print writer first prints the file header and the number of records to be stored into the file. <p>
+   * Block 10: A loop runs for the total number of records to print all of the data stored in each record. <p>
+   * Block 11: The print writer is closed, currentFile is set to the selected file, and isSaved is set to true. <p>
+   * Block 12: If there were any exceptions thrown then it is caught and an error message is shown to the user.
+   * <p>
+   * @param none
+   */
+  public void saveAs ()
+  {
+    JFileChooser fc = makeFileChooser("Untitled");
+    
+    int result = fc.showSaveDialog(this);
+    if (result == JFileChooser.APPROVE_OPTION)
+    {
+      File file = new File(fc.getSelectedFile()+".liek");
+      String name = file.getName();
+      
+      if (file == null || name.equals ("") || name.length () > 255)
+        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
+      
+      else if (!name.substring(name.length()-4).equalsIgnoreCase("liek"))
+        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
+      
+      else
+        saveFile(true, file);
+    }
+  }
+  
+  /**
+   * Performs specific tasks for each button the user selects.
+   * @param e ActionEvent
+   */
+  public void actionPerformed (ActionEvent e)
+  {
+    String cmd = e.getActionCommand ();
+    
+    if (PREVIOUS.equals (cmd))
+    {
+      if (students.size()!=0)
+      {
+        if (currentRecord == 0)
+          currentRecord = students.size()-1;
+        else
+          currentRecord--;
+      }
+    }
+    
+    else if (NEXT.equals (cmd))
+    {
+      if (students.size()!=0)
+      {
+        if (currentRecord == students.size()-1)
+          currentRecord = 0;
+        else
+          currentRecord++;
+      }
+    }
+    
+    else if (NEW.equals (cmd))
+    {
+      currentRecord = -1;
+    }
+    
+    else if (SUBMIT.equals (cmd))
+    {
+//      String first = firstText.getText();
+//      String last = lastText.getText();
+//      String time = timeText.getText();
+//      String reason = reasonText.getText();
+//      StudentRecord s = new StudentRecord (first,last,time,reason);
+//      
+//      outerIf:
+//        if (first.isEmpty()&&last.isEmpty()&&time.isEmpty()&&reason.isEmpty())
+//        JOptionPane.showMessageDialog (this, "Please enter at least one field", "ERROR", JOptionPane.ERROR_MESSAGE);
+//        
+//        else
+//        {
+//          if (!time.isEmpty())
+//          {
+//            if (DataCheck.checkTime(time)!=0)
+//            {
+//              if (DataCheck.checkTime(time)==1)
+//                JOptionPane.showMessageDialog (this, "Time must contain one '@' symbol.", "Time", JOptionPane.ERROR_MESSAGE);
+//              
+//              else if (DataCheck.checkTime(time)==2)
+//                JOptionPane.showMessageDialog (this, "Time can only contain alpha-numeric characters, periods, dashes, underscores, and a '@' symbol.", "Time", JOptionPane.ERROR_MESSAGE);
+//              
+//              else if (DataCheck.checkTime(time)==3)
+//                JOptionPane.showMessageDialog (this, "There must be characters before and after the '@' symbol.", "Time", JOptionPane.ERROR_MESSAGE);
+//              
+//              break outerIf;
+//            }
+//          }
+//          if (!reason.isEmpty())
+//          {
+//            if (DataCheck.checkReason(reason)!=0)
+//            {
+//              if (DataCheck.checkReason(reason)==1)
+//                JOptionPane.showMessageDialog (this, "Reason number must be 10 digits long, with 2 dashes or spaces, if any.", "Reason", JOptionPane.ERROR_MESSAGE);
+//              
+//              else if (DataCheck.checkReason(reason)==2)
+//                JOptionPane.showMessageDialog (this, "Reason number can only contain digits, dashes and spaces.", "Reason", JOptionPane.ERROR_MESSAGE);
+//              
+//              else if (DataCheck.checkReason(reason)==3)
+//                JOptionPane.showMessageDialog (this, "Any dashes or spaces must be in the correct placements.", "Reason", JOptionPane.ERROR_MESSAGE);
+//              
+//              break outerIf;
+//            }
+//          }
+//          
+//          if (currentRecord == -1)
+//          {
+//            students.add(s);
+//            currentRecord = students.size()-1;
+//          }
+//          else
+//            students.set(currentRecord,s);
+//          
+//          if (!first.isEmpty())
+//            s.setFirst(first);
+//          if (!last.isEmpty())
+//            s.setLast(last);
+//          if (!reason.isEmpty())
+//            s.setReason(reason);
+//          
+//          isSaved = false;
+//        }
+//    }
+//    else
+//    {
+//      if (DELETE.equals (cmd))
+//      {
+//        if (students.size()!=0)
+//        {
+//          if (currentRecord==-1)
+//            currentRecord=0;
+//          else
+//          {
+//            students.remove(currentRecord);
+//            currentRecord--;
+//            isSaved = false;
+//          }
+//        }
+//      }
+    }
+    
+    displayBook ();
+  }
+  
+  /**
+   * Updates the text on all the text fields and label after a button was selected by the user.
+   * <p>
+   * Blocks: <p>
+   * Block 1: An if structure checking if the current record equals -1. If so, all text fields are set to be blank. <p>
+   * Block 2: Else, all the text fields are set to the strings stored in the arraylist at the current record number. <p>
+   * Block 3: The current label text is set to the current record number and the size of the array.
+   * <p>
+   * @param first String
+   * @param last String
+   * @param time String
+   * @param reason String
+   */
+  protected void displayBook ()
+  {
+    if (currentRecord == -1)
+    {
+      firstText.setText("");
+      lastText.setText("");
+      timeText.setText("");
+      reasonText.setText("");
+    }
+    
+    else
+    {
+      firstText.setText(students.get(currentRecord).getFirst());
+      lastText.setText(students.get(currentRecord).getLast());
+      timeText.setText(students.get(currentRecord).getTime());
+      reasonText.setText(students.get(currentRecord).getReason());
+    }
+    
+    currentLabel.setText((currentRecord+1) + " of " + students.size());
+    updateUI();
+  }
+}

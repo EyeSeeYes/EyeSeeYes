@@ -1,0 +1,572 @@
+//The "DatabaseApp" class.
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+/**
+ * The class that runs the program. <p>
+ * Creates a new instance of BindrBook and adds it to a window. <p>
+ * @author Ms.Dyke, edited by Angela Jeong
+ * @version 3.0, May 14, 2014
+ */
+public class BindrDatabase extends JFrame implements ActionListener
+{
+  /**
+   * An instance of the BindrBook class to be added to this class.
+   */
+  BindrBook b;
+  ButtonGroup group, fieldGroup, settingsGroup;
+  boolean isWhole, isSorted, isSelected;
+  /**
+   * The class constructor - Creates a new instance of BindrBook and adds it to a window.
+   * <p>
+   * Variables: <p>
+   * newItem - JMenuItem - A menu item that creates a new file when selected. <p>
+   * openItem - JMenuItem - A menu item that opens an existing file when selected. <p>
+   * saveItem - JMenuItem - A menu item that saves the data to the current file when slected. <p>
+   * saveAsItem - JMenuItem - A menu item that saves the data to a new or existing file when selected. <p>
+   * quitItem - JMenuItem - A menu item that exits the program when selected. <p>
+   * fileMenu - JMenu - The menu containing all of the above menu items. <p>
+   * myMenus - JMenuBar - The menu bar containing the above menu.
+   * <p>
+   * Blocks: <p>
+   * Block 1: Creates a new instance of BindrBook and adds its contents to the program. <p>
+   * Block 2: Creates the menu items, the menu, and the menu bar. <p>
+   * Block 3: Adds the menu items to the menu, the menu to the menu bar, and sets the menubar as the frame's menu bar. <p>
+   * Block 4: Adds action listeners to the menu items so that they will perform actions when selected. <p>
+   * Block 5: Sets the title, size, and location of the frame and makes it visible to the user. <p>
+   * Block 6: Sets the default close operation of the frame.
+   * <p>
+   * @param none
+   */
+  public BindrDatabase()
+  {
+    b = new BindrBook ();
+    add (b);
+    
+    JMenuItem newItem = new JMenuItem ("New");
+    JMenuItem openItem = new JMenuItem ("Open");
+    JMenuItem saveItem = new JMenuItem ("Save");
+    JMenuItem saveAsItem = new JMenuItem ("Save As");
+    JMenuItem quitItem = new JMenuItem ("Quit");
+    JMenuItem bindrBookItem = new JMenuItem ("Bindr Book");
+    JMenuItem tableItem = new JMenuItem ("Table");
+    JMenuItem bubbleItem = new JMenuItem ("Bubble");
+    JMenuItem insertionItem = new JMenuItem ("Insertion");
+    JMenuItem selectionItem = new JMenuItem ("Selection");
+    JMenuItem searchItem = new JMenuItem ("Search");
+    
+    JMenu fileMenu = new JMenu ("File");
+    JMenu displayMenu = new JMenu ("Display");
+    JMenu sortMenu = new JMenu ("Sort");
+    JMenu searchMenu = new JMenu ("Search");
+    JMenuBar myMenus = new JMenuBar ();
+    
+    fileMenu.add (newItem);
+    fileMenu.add (openItem);
+    fileMenu.add (saveItem);
+    fileMenu.add (saveAsItem);
+    fileMenu.add (quitItem);
+    displayMenu.add (bindrBookItem);
+    displayMenu.add (tableItem);
+    sortMenu.add (bubbleItem);
+    sortMenu.add(insertionItem);
+    sortMenu.add(selectionItem);
+    searchMenu.add(searchItem);
+    myMenus.add (fileMenu);
+    myMenus.add (displayMenu);
+    myMenus.add(sortMenu);
+    myMenus.add(searchMenu);
+    setJMenuBar (myMenus);
+    
+    newItem.addActionListener (this);
+    openItem.addActionListener (this);
+    saveItem.addActionListener (this);
+    saveAsItem.addActionListener (this);
+    quitItem.addActionListener (this);
+    bindrBookItem.addActionListener (this);
+    tableItem.addActionListener (this);
+    bubbleItem.addActionListener(this);
+    insertionItem.addActionListener(this);
+    selectionItem.addActionListener(this);
+    searchItem.addActionListener(this);
+    
+    setTitle("Untitled");
+    setSize (500, 500);
+    setLocationRelativeTo(null);
+    setVisible (true);
+    
+    setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
+  }
+  
+  private void makeWelcomeDialog ()
+  {
+    JDialog d = new JDialog (this, "Welcome");
+    
+    d.setSize (250,100);
+    d.setResizable (false);
+    d.setLayout (new FlowLayout());
+    
+    JButton studentButton = new JButton("Student");
+    studentButton.setPreferredSize(new Dimension(25,25));
+    studentButton.addActionListener (new ActionListener()
+                                       {
+      public void actionPerformed (ActionEvent e)
+      {
+        //addRecordDialog();
+      }
+    });
+    
+    JButton teacherButton = new JButton("Teacher");
+    teacherButton.setPreferredSize(new Dimension(25,25));
+    teacherButton.addActionListener (new ActionListener()
+                                       {
+      public void actionPerformed (ActionEvent e)
+      {
+       // loginDialog();
+      }
+    });
+  }
+  
+  private void makeSortDialog (final String type)
+  {
+    JDialog d = new JDialog (this, type + " Sort");
+    isSelected = false;
+    
+    d.setSize (250,100);
+    d.setResizable (false);
+    d.setLayout (new FlowLayout());
+    
+    JLabel label = new JLabel ("Sort By:");
+    group = new ButtonGroup ();
+    JRadioButton firstButton = new JRadioButton ("First Name");
+    firstButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSorted)
+        {
+          isSorted = false;
+          b.createData();
+          group.clearSelection();
+        }
+        else
+        {
+          if (type.equals("Bubble"))
+            b.sort(1,1);
+          else if (type.equals("Insertion"))
+            b.sort(2,1);
+          else
+            b.sort(3,1);
+          isSorted = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton lastButton = new JRadioButton ("Last Name");
+    lastButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSorted)
+        {
+          isSorted = false;
+          b.createData();
+          group.clearSelection();
+        }
+        else
+        {
+          if (type.equals("Bubble"))
+            b.sort(1,2);
+          else if (type.equals("Insertion"))
+            b.sort(2,2);
+          else
+            b.sort(3,2);
+          isSorted = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton timeButton = new JRadioButton ("Time");
+    timeButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSorted)
+        {
+          isSorted = false;
+          b.createData();
+          group.clearSelection();
+        }
+        else
+        {
+          if (type.equals("Bubble"))
+            b.sort(1,3);
+          else if (type.equals("Insertion"))
+            b.sort(2,3);
+          else
+            b.sort(3,3);
+          isSorted = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton reasonButton = new JRadioButton ("Reason");
+    reasonButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSorted)
+        {
+          isSorted = false;
+          b.createData();
+          group.clearSelection();
+        }
+        else
+        {
+          if (type.equals("Bubble"))
+            b.sort(1,4);
+          else if (type.equals("Insertion"))
+            b.sort(2,4);
+          else
+            b.sort(3,4);
+          isSorted = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    group.add(firstButton);
+    group.add(lastButton);
+    group.add(timeButton);
+    group.add(reasonButton);
+    
+    d.add(label);
+    d.add(firstButton);
+    d.add(lastButton);
+    d.add(timeButton);
+    d.add(reasonButton);
+    d.setLocationRelativeTo (this);
+    d.setVisible (true);
+  }
+  
+  
+  private void makeSearchDialog()
+  {
+    JDialog d = new JDialog (this, "Search");
+    isSelected = false;
+    isWhole = true;
+    
+    d.setSize (300,200);
+    d.setResizable (false);
+    d.setLayout (new FlowLayout());
+    
+    JLabel matchLabel = new JLabel ("Search for:");
+    final JTextField text = new JTextField (20);
+    
+    settingsGroup = new ButtonGroup ();
+    JRadioButton partialButton = new JRadioButton ("Partial Match");
+    partialButton.setSelected(true);
+    partialButton.addActionListener (new ActionListener()
+                                       {
+      public void actionPerformed (ActionEvent e)
+      {
+        isWhole=false;
+      }
+    });
+    
+    JRadioButton wholeButton = new JRadioButton ("Match Whole Word");
+    wholeButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        isWhole=true;
+      }
+    });
+    
+    JLabel fieldLabel = new JLabel ("Search In:");
+    fieldGroup = new ButtonGroup ();
+    JRadioButton firstButton = new JRadioButton ("First Name");
+    firstButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSelected)
+        {
+          isSelected = false;
+          isSorted = false;
+          b.createData();
+          fieldGroup.clearSelection();
+        }
+        else
+        {
+          if (!isSorted)
+          {
+            b.search(1,1,isWhole,text.getText());
+            System.out.println(text.getText());
+          }
+          else
+            b.search(2,1,isWhole,text.getText());
+          isSelected = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton lastButton = new JRadioButton ("Last Name");
+    lastButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSelected)
+        {
+          isSelected = false;
+          isSorted = false;
+          b.createData();
+          fieldGroup.clearSelection();
+        }
+        else
+        {
+          if (!isSorted)
+            b.search(1,2,isWhole,text.getText());
+          else
+            b.search(2,2,isWhole,text.getText());
+          isSelected = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton timeButton = new JRadioButton ("Time");
+    timeButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSelected)
+        {
+          isSelected = false;
+          isSorted = false;
+          b.createData();
+          fieldGroup.clearSelection();
+        }
+        else
+        {
+          if (!isSorted)
+            b.search(1,3,isWhole,text.getText());
+          else
+            b.search(2,3,isWhole,text.getText());
+          isSelected = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton reasonButton = new JRadioButton ("Reason");
+    reasonButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSelected)
+        {
+          isSelected = false;
+          isSorted = false;
+          b.createData();
+          fieldGroup.clearSelection();
+        }
+        else
+        {
+          if (!isSorted)
+            b.search(1,4,isWhole,text.getText());
+          else
+            b.search(2,4,isWhole,text.getText());
+          isSelected = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    settingsGroup.add(partialButton);
+    settingsGroup.add(wholeButton);
+    
+    fieldGroup.add(firstButton);
+    fieldGroup.add(lastButton);
+    fieldGroup.add(timeButton);
+    fieldGroup.add(reasonButton);
+    
+    d.add(matchLabel);
+    d.add(text);
+    d.add(partialButton);
+    d.add(wholeButton);
+    d.add(fieldLabel);
+    d.add(firstButton);
+    d.add(lastButton);
+    d.add(timeButton);
+    d.add(reasonButton);
+    d.setLocationRelativeTo (this);
+    d.setVisible (true);
+  }
+  
+  private void checkIsSaved ()
+  {
+    int confirm;
+    
+    if (b.isSaved == false)
+    {
+      confirm = JOptionPane.showConfirmDialog (b, "The file you are currently on is not saved. Save this file?", "Unsaved File", JOptionPane.YES_NO_CANCEL_OPTION);
+      
+      if (confirm == JOptionPane.YES_OPTION)
+        b.saveFile(false, b.currentFile);
+      else
+      {
+        if (confirm == JOptionPane.NO_OPTION)
+          b.isSaved = true;
+      }
+    }
+  }
+  
+  
+  private void displayLayout (boolean layout, boolean newTable)
+  {
+    b.removeAll();
+    if (layout)
+    {
+      b.makeBook();
+      b.displayBook();
+    }
+    else
+    {
+      if (newTable)
+        b.createData();
+      b.makeTable();
+    }
+    b.updateUI();
+  }
+  
+  
+  /**
+   * The actionPerforme method - performs specific tasks corresponding to the menu item selected by the user.
+   * <p>
+   * Blocks: <p>
+   * Block 1: An if structure that checks if the Quit item was selected. If so, the program exits. <p>
+   * Block 2: An if structure that checks if the New item was selected. If so, a new file is created and the title set to "Untitled". <p>
+   * Block 3: An if structure that checks if the Open item was selected. If so, the open file dialog is shown and the title set to the opened file. <p>
+   * Block 4: An if structure that checks if the Save item was selected. If so, the file is overwritten with the submitted data. <p>
+   * Block 5: An if structure that checks if the Save As item was selected. 
+   * If so, a new or existing file is overwritten with the submitted data and the title set to the opened file. 
+   * <p>
+   * @param e ActionEvent - stores user input from the class constructor.
+   */
+  public void actionPerformed (ActionEvent e)
+  {
+    if (e.getActionCommand ().equals ("Quit"))
+    {
+      System.exit (0);
+    }
+    
+    if (e.getActionCommand ().equals ("New"))
+    {
+      checkIsSaved();
+      if (b.isSaved)
+      {
+        b.newFile();
+        displayLayout(b.currentLayout,true);
+        setTitle("Untitled");
+        b.updateUI();
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Open"))
+    {
+      checkIsSaved();
+      if (b.isSaved)
+      {
+        b.openFile();
+        displayLayout(b.currentLayout,true);
+        setTitle(b.currentFile.getName());
+        b.updateUI();
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Save"))
+    {
+      if (b.students.isEmpty())
+        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        if (!b.currentLayout)
+          b.saveTable();
+        b.saveFile(false, b.currentFile);
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Save As"))
+    {
+      if (b.students.isEmpty())
+        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        if (!b.currentLayout)
+          b.saveTable();
+        b.saveAs();
+        setTitle(b.currentFile.getName());
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Bindr Book"))
+    {
+      if (b.students.size()!=0)
+        b.currentRecord=0;
+      displayLayout(true,true);
+    }
+    
+    if (e.getActionCommand ().equals ("Table"))
+    {
+      displayLayout(false,true);
+    }
+    
+    if (e.getActionCommand ().equals ("Bubble"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSortDialog("Bubble");
+    }
+    
+    if (e.getActionCommand ().equals ("Insertion"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSortDialog("Insertion");
+    }
+    
+    if (e.getActionCommand ().equals ("Selection"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSortDialog("Selection");
+    }
+    
+    if (e.getActionCommand ().equals ("Search"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSearchDialog();
+    }
+  }
+  
+  /**
+   * The main method - Creates a new instance of this class to run the program.
+   * <p>
+   * Blocks: <p>
+   * Block 1: Creates a new instance of this class.
+   * <p>
+   * @param args String[]
+   */
+  public static void main (String[] args)
+  {
+    BindrDatabase d = new BindrDatabase();
+    d.makeWelcomeDialog();
+  } // main method
+}

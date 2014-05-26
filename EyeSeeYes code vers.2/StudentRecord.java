@@ -4,6 +4,7 @@
  * The class that stores and formats all of the records.
  * @author Ms.Dyke, edited by Angela Jeong
  * @version 2.1, Mar 20, 2014
+ * //NATHAN IS SUPER COOL
  */
 public class StudentRecord
 {

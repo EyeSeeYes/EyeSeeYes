@@ -1,0 +1,212 @@
+// The "FrameTest" class.
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
+import java.io.*;
+
+
+/**
+ * @author Ms Dyke modified version of assignment 4 by Janelle Sookhai
+ * @version 1.0 Date Mar 28/14
+ * 
+ * Where the JFrame, menu bar, menus, and menu items are created and added.
+ * 
+ * @param d references the JDialog class.<br>
+ * @param  fileName - Name of the file being selected.<br>
+ * @param line1 - Used to check the header of the file.<br>
+ * @paaram frame - Creates a JFrame.<br>
+ * @param p - References PersonRecord.<br>
+ * @param header - Used to check the header of the file.<br>
+ * @param firstLn - The line containing the first name.<br>
+ * @param lastLn - The line containing the last name.<br>
+ * @param phonetLn - The line containing the phone number.<br>
+ * @param emailLn - The line containing the email.<br>
+ * @param a - References AddressBook2.<br>
+ */
+
+public class DatabaseApp extends JFrame implements ActionListener
+{
+  private JDialog d;
+  private String line1;
+  
+  AddressBook2 a = new AddressBook2();
+  
+  /**
+   * 
+   * Adds the menu bar, menu, and menu items to the JFrame. 
+   * 
+   * @param t references the TextTest class, later used to add the content from TextTest to the JFrame.
+   * @param quitItem creates the 'Quit' menu item. 
+   * @param helpItem creates the 'Help' menu item. 
+   * @param aboutItem creates the 'About' menu item. 
+   * @param fileMenu creates the 'File' menu.
+   * @param helpMenu creates the 'Help!' menu. 
+   * @param myMenus creates a menu bar at the top of the screen. 
+   * 
+   */
+  
+  public DatabaseApp ()
+  {
+    super ("Address Book");
+    
+    //AddressBook2 a = new AddressBook2 ();
+    getContentPane().add (a);
+    //getContentPane().add(JTableMine()); //new not sure if it works. 
+    
+    JMenuItem helpItem = new JMenuItem ("Help");
+    JMenuItem aboutItem = new JMenuItem ("About Me");
+    JMenuItem newItem = new JMenuItem ("New");
+    JMenuItem openItem = new JMenuItem ("Open");
+    JMenuItem saveItem = new JMenuItem ("Save");
+    JMenuItem saveAsItem = new JMenuItem ("Save As");
+    JMenuItem quitItem = new JMenuItem ("Quit");
+    JMenuItem tableItem = new JMenuItem ("Table View");
+    JMenuItem normalItem = new JMenuItem ("Regular View");
+    
+    JMenu fileMenu = new JMenu ("File");
+    JMenu helpMenu = new JMenu ("Help!");
+    JMenu displayMenu = new JMenu ("Display");
+    
+    fileMenu.add (newItem);
+    fileMenu.add (openItem);
+    fileMenu.add (saveItem);
+    fileMenu.add (saveAsItem);
+    fileMenu.add (quitItem);
+    helpMenu.add (helpItem);
+    helpMenu.add (aboutItem);
+    displayMenu.add (tableItem);
+    displayMenu.add (normalItem);
+    
+    JMenuBar myMenus = new JMenuBar ();
+    
+    myMenus.add (fileMenu);
+    myMenus.add (helpMenu);
+    myMenus.add (displayMenu);
+    
+    setJMenuBar (myMenus);
+    
+    newItem.addActionListener (this);
+    openItem.addActionListener (this);
+    saveItem.addActionListener (this);
+    saveAsItem.addActionListener (this);
+    quitItem.addActionListener (this);
+    helpItem.addActionListener (this);
+    aboutItem.addActionListener (this);
+    tableItem.addActionListener (this);
+    normalItem.addActionListener (this);
+    
+    setSize (600, 400);
+    setVisible (true);
+    setResizable (false);
+    
+    saveItem.setEnabled(false);
+    saveAsItem.setEnabled(false);
+    
+    setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
+  }
+  
+  /**
+   * Sets the size, visibility, default close, and layout of the window. 
+   * 
+   * @param field1 JLabel used to display discriptions from the buttons. 
+   * @param helpButton creates the close button in the help menu pop up. 
+   */
+  public void makeDialog (String dialogName, String labelName)
+  {
+    
+    d = new JDialog (this, dialogName);
+    d.setSize (700, 100);
+    d.setResizable (false);
+    d.getContentPane ().setLayout (new FlowLayout ());
+    
+    JLabel field1;
+    field1 = new JLabel (labelName);
+    field1.setFont (new Font ("Serif", Font.PLAIN, 16));
+    d.getContentPane ().add (field1);
+    
+    JButton helpButton = new JButton ("Close");
+    helpButton.addActionListener (new ActionListener ()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        d.dispose ();
+      }
+    }
+    )
+      ;
+    
+    d.getContentPane ().add (helpButton);
+    d.setLocationRelativeTo (this);
+    d.setVisible (true);
+  }
+  
+  /**
+   * Runs something different depending on the menu item selected by the user. 
+   * If the user selects 'Quit' the window will close. If 'Help' or 'About Me' is 
+   * selected a pop up will come up respectively. 
+   * 
+   * @param ae refers to the ActionEvent class 
+   */
+  public void actionPerformed (ActionEvent ae)
+  {
+    if (ae.getActionCommand ().equals ("Quit"))
+    {
+      System.exit (0);
+    }
+    else if (ae.getActionCommand ().equals ("Help"))
+    {//TEXT CURRENTLY TOO BIG FOR BOX FIGURE THIS OUT EVENTUALLY
+      makeDialog ("Help me", "Phone numbers can only be 10 digits long. They may be in the format 'xxx-xxx-xxxx' 'xxx xxx xxxx' or 'xxxxxxxxxx'.");
+    }
+    else if (ae.getActionCommand ().equals ("About Me"))
+    {
+      makeDialog ("About me", "My name is Janelle.");
+    }
+    else if (ae.getActionCommand ().equals ("Table View"))
+    {
+      a.removeAll();
+      a.JTableMine();
+      a.updateUI();
+      
+      System.out.println ("table view");
+    }
+    else if (ae.getActionCommand ().equals ("Regular View"))
+    {
+      if (a.persons.size()!= 0)
+      {
+        a.recordCount = 0;
+      }
+      a.removeAll();
+      a.toolBar.removeAll();
+      a.showAddressBook();
+      a.updateUI();
+      
+      System.out.println ("regular view");
+      
+    }
+    else if (ae.getActionCommand ().equals ("New"))
+    {
+      a.askSave(ae);
+      a.newFile();
+    }
+    else if (ae.getActionCommand ().equals ("Open"))
+    {
+      a.openFile();
+    }
+    else if (ae.getActionCommand ().equals ("Save"))
+    {
+      a.saveFile();
+    }
+    else 
+    {
+      if (ae.getActionCommand ().equals ("Save As"))
+      {
+        a.askSave(ae);
+        a.saveFile();
+      }
+    }
+  }
+  public static void main (String[] args)
+  {
+    new DatabaseApp ();       // Create a Database frame
+  } // main method
+ }

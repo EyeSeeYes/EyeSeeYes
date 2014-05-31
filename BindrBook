@@ -88,15 +88,15 @@ public class BindrBook extends JPanel implements ActionListener
    */
   public BindrBook()
   {
-    //makeBook();
+    //makeBook(false);
   }
   
   /**
    * The makeBook method - makes the binder-view used when adding in new records.
-   * Coded by Janelle, edited by Angela
+   * Coded by Janelle
    * @param boolean isTeacher
    */
-   public void makeBook (boolean isTeacher)
+  public void makeBook (boolean isTeacher)
   {
     setLayout (new BorderLayout ());
     
@@ -121,20 +121,20 @@ public class BindrBook extends JPanel implements ActionListener
     inputTime = new JTextField (10);
     inputReason = new JTextField (15);
     
-    add (firstName, BorderLayout.LINE_START);
-    add (inputFirstName);
+    p.add (firstName, BorderLayout.LINE_START);
+    p.add (inputFirstName);
     
-    add (lastName, BorderLayout.LINE_START);
-    add (inputLastName);
+    p.add (lastName, BorderLayout.LINE_START);
+    p.add (inputLastName);
     
     if (isTeacher)
     {
-      add (time, BorderLayout.LINE_START);
-      add (inputTime);
+      p.add (time, BorderLayout.LINE_START);
+      p.add (inputTime);
     }
     
-    add (signInButton, BorderLayout.LINE_START);
-    add (signOutButton);
+    p.add (signInButton, BorderLayout.LINE_START);
+    p.add (signOutButton);
     
     signInOutGroup = new ButtonGroup();
     signInOutGroup.add (signInButton);
@@ -146,12 +146,12 @@ public class BindrBook extends JPanel implements ActionListener
     if (isTeacher)
     {
       JRadioButton absentButton = new JRadioButton ("Absent");
-      add (absentButton);
+      p.add (absentButton);
       absentButton.addActionListener (this);
     }
     
-    add (reason, BorderLayout.LINE_START);
-    add (inputReason);
+    p.add (reason, BorderLayout.LINE_START);
+    p.add (inputReason);
     
     Font myFont = new Font ("Helvetica" , Font.PLAIN , 16);
     //set font for the JLabels
@@ -204,7 +204,7 @@ public class BindrBook extends JPanel implements ActionListener
     
     return button;
   }
-
+  
 //  public void makeTable ()
 //  {
 //    setLayout (new BorderLayout ());
@@ -597,7 +597,7 @@ public class BindrBook extends JPanel implements ActionListener
 //    
 //    displayBook ();
   }
-
+  
   /**
    * Updates the text on all the text fields and label after a button was selected by the user.
    * @param first String
@@ -621,7 +621,7 @@ public class BindrBook extends JPanel implements ActionListener
       inputFirstName.setText(students.get(currentRecord).getFirst());
       inputLastName.setText(students.get(currentRecord).getLast());
       if (isTeacher)
-      inputTime.setText(students.get(currentRecord).getTime());
+        inputTime.setText(students.get(currentRecord).getTime());
       inputReason.setText(students.get(currentRecord).getReason());
     }
     

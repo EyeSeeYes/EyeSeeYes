@@ -30,6 +30,9 @@ public class BindrDatabase extends JFrame implements ActionListener
    */
   public BindrDatabase()
   {
+    setSize (500, 350);
+    setResizable(false);
+    setVisible(true);
     try
     {
       splashScreen();
@@ -39,10 +42,6 @@ public class BindrDatabase extends JFrame implements ActionListener
     }
     accessLevels();
     add(cardLayoutPanel);
-    setSize (500, 350);
-    setResizable(false);
-    setVisible(true);
-    System.out.println ("hi");
     SwingUtilities.updateComponentTreeUI(this);
   }
   
@@ -118,19 +117,21 @@ public class BindrDatabase extends JFrame implements ActionListener
     }
     ImageIcon icon=new ImageIcon(img);
     splashScreenPanel.setLayout(new FlowLayout());
+    
     JLabel imageLabel=new JLabel();
     imageLabel.setIcon(icon);
     splashScreenPanel.add(imageLabel);
     add (splashScreenPanel);
     SwingUtilities.updateComponentTreeUI(this);
-    try 
+    
+    try
     {
-      wait(1500);
+      Thread.sleep(1500);
+      remove (splashScreenPanel);
     }
     catch (InterruptedException ie)
     {
     }
-    this.removeAll();
   }
   
   private void makeDatabaseApp ()
@@ -181,7 +182,7 @@ public class BindrDatabase extends JFrame implements ActionListener
     
     setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
   }
-//  
+
 //  private void makeSortDialog (final String type)
 //  {
 //    JDialog d = new JDialog (this, "Sort");

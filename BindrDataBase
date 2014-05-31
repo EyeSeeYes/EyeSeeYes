@@ -9,8 +9,8 @@ import java.io.*;
 /**
  * The class that runs the program. <p>
  * Creates a new instance of BindrBook and adds it to a window. <p>
- * @author Angela Jeong
- * @version 3.0, May 14, 2014
+ * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
+ * @version 4.0, May 31, 2014
  */
 public class BindrDatabase extends JFrame implements ActionListener
 {
@@ -26,13 +26,17 @@ public class BindrDatabase extends JFrame implements ActionListener
   
   /**
    * The class constructor - Creates a new instance of BindrBook and adds it to a window.
+   * Coded by Angela
    * @param none
    */
   public BindrDatabase()
   {
     setSize (500, 350);
     setResizable(false);
+    setLocationRelativeTo(null);
+    setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
     setVisible(true);
+    
     try
     {
       splashScreen();
@@ -42,69 +46,15 @@ public class BindrDatabase extends JFrame implements ActionListener
     }
     accessLevels();
     add(cardLayoutPanel);
+    
     SwingUtilities.updateComponentTreeUI(this);
   }
   
-  public void accessLevels () 
-  {
-    JLabel welcome = new JLabel ("Welcome to Bindr!");
-    JButton student = new JButton ("Student");
-    JButton teacher = new JButton ("Teacher");
-    JLabel username = new JLabel ("Username: ");
-    JLabel password = new JLabel ("Password: ");
-    JButton signIn = new JButton ("Sign In");
-    JButton back = new JButton ("Back");
-    JTextField usernameField = new JTextField ();
-    JPasswordField passwordField = new JPasswordField ();
-    final JPanel openBindrPanel = new JPanel (null);
-    final JPanel loginScreensPanel = new JPanel (null);
-    openBindrPanel.removeAll ();
-    openBindrPanel.validate ();
-    welcome.setFont (new Font ("Arial", Font.PLAIN, 16)); 
-    welcome.setBounds (175, 0, 400, 50);
-    student.setBounds (30, 65, 203, 203);
-    teacher.setBounds (265, 65, 203, 203);
-    student.addActionListener (new ActionListener ()
-                                 {
-      public void actionPerformed (ActionEvent e)
-      {
-        System.exit (0);
-      }});
-    teacher.addActionListener (new ActionListener ()
-                                 {
-      public void actionPerformed (ActionEvent e)
-      {
-        cardLayoutPanel.add (loginScreensPanel, "LP");
-        cards.show (cardLayoutPanel, "LP");
-      }});
-    openBindrPanel.add (welcome);
-    openBindrPanel.add (student);
-    openBindrPanel.add (teacher);
-    loginScreensPanel.removeAll ();
-    loginScreensPanel.validate ();
-    username.setFont (new Font ("Arial", Font.PLAIN, 16)); 
-    password.setFont (new Font ("Arial", Font.PLAIN, 16));
-    username.setBounds (30, 90, 100, 50);
-    usernameField.setBounds (135, 103, 200, 25);
-    password.setBounds (30, 165, 100, 50);
-    passwordField.setBounds (135, 178, 200, 25);
-    signIn.setBounds (250, 250, 200, 50);
-    back.setBounds (15, 265, 100, 35);
-    back.addActionListener (new ActionListener ( )
-                              {
-      public void actionPerformed (ActionEvent e)
-      {
-        cards.show (cardLayoutPanel, "OP");
-      }});
-    loginScreensPanel.add (username);
-    loginScreensPanel.add (usernameField);
-    loginScreensPanel.add (password);
-    loginScreensPanel.add (passwordField);
-    loginScreensPanel.add (signIn);
-    loginScreensPanel. add (back);
-    cardLayoutPanel.add (openBindrPanel, "OP");
-  }
-  
+  /**
+   * Makes the splash screen with the pretty logo on it. (Whoever made that logo is a great artist)
+   * Coded by Nathan
+   * @param none
+   */
   private void splashScreen ()
   {
     JPanel splashScreenPanel = new JPanel();
@@ -134,8 +84,105 @@ public class BindrDatabase extends JFrame implements ActionListener
     }
   }
   
+  /**
+   * makes the access levels screen thing with student and teacher on it
+   * Coded by Lucas
+   * @param none
+   */
+  public void accessLevels () 
+  {
+    JLabel welcome = new JLabel ("Welcome to Bindr!");
+    JButton student = new JButton ("Student");
+    JButton teacher = new JButton ("Teacher");
+    JLabel username = new JLabel ("Username: ");
+    JLabel password = new JLabel ("Password: ");
+    JButton signIn = new JButton ("Sign In");
+    JButton back = new JButton ("Back");
+    JTextField usernameField = new JTextField ();
+    JPasswordField passwordField = new JPasswordField ();
+    final JPanel openBindrPanel = new JPanel (null);
+    final JPanel loginScreensPanel = new JPanel (null);
+    
+    openBindrPanel.removeAll ();
+    openBindrPanel.validate ();
+    
+    welcome.setFont (new Font ("Arial", Font.PLAIN, 16)); 
+    welcome.setBounds (175, 0, 400, 50);
+    
+    student.setBounds (30, 65, 203, 203);
+    student.addActionListener (new ActionListener ()
+                                 {
+      public void actionPerformed (ActionEvent e)
+      {
+        remove(cardLayoutPanel);
+        b = new BindrBook();
+        b.makeBook(false);
+        add(b);
+        revalidate();
+      }});
+    
+    teacher.setBounds (265, 65, 203, 203);
+    teacher.addActionListener (new ActionListener ()
+                                 {
+      public void actionPerformed (ActionEvent e)
+      {
+        cardLayoutPanel.add (loginScreensPanel, "LP");
+        cards.show (cardLayoutPanel, "LP");
+      }});
+    
+    openBindrPanel.add (welcome);
+    openBindrPanel.add (student);
+    openBindrPanel.add (teacher);
+    
+    loginScreensPanel.removeAll ();
+    loginScreensPanel.validate ();
+    
+    username.setFont (new Font ("Arial", Font.PLAIN, 16)); 
+    username.setBounds (30, 90, 100, 50);
+    usernameField.setBounds (135, 103, 200, 25);
+    
+    password.setFont (new Font ("Arial", Font.PLAIN, 16));
+    password.setBounds (30, 165, 100, 50);
+    passwordField.setBounds (135, 178, 200, 25);
+    
+    signIn.setBounds (250, 250, 200, 50);
+    signIn.addActionListener (new ActionListener ()
+                                {
+      public void actionPerformed (ActionEvent e)
+      {
+        remove(cardLayoutPanel);
+        makeDatabaseApp ();
+        revalidate();
+      }});
+    
+    back.setBounds (15, 265, 100, 35);
+    back.addActionListener (new ActionListener ( )
+                              {
+      public void actionPerformed (ActionEvent e)
+      {
+        cards.show (cardLayoutPanel, "OP");
+      }});
+    
+    loginScreensPanel.add (username);
+    loginScreensPanel.add (usernameField);
+    loginScreensPanel.add (password);
+    loginScreensPanel.add (passwordField);
+    loginScreensPanel.add (signIn);
+    loginScreensPanel. add (back);
+    cardLayoutPanel.add (openBindrPanel, "OP");
+  }
+  
+  /**
+   * makes the database app thing for teacher view. the one with the menus in it
+   * Coded by Angela
+   * @param none
+   */
   private void makeDatabaseApp ()
   {
+    b = new BindrBook();
+    b.makeBook(true);
+    add (b);
+    
     JMenuItem newItem = new JMenuItem ("New");
     JMenuItem openItem = new JMenuItem ("Open");
     JMenuItem saveItem = new JMenuItem ("Save");
@@ -175,14 +222,9 @@ public class BindrDatabase extends JFrame implements ActionListener
     sortItem.addActionListener(this);
     searchItem.addActionListener(this);
     
-    setTitle("Untitled");
-    setSize (500, 500);
-    setLocationRelativeTo(null);
-    setVisible (true);
-    
-    setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
+    SwingUtilities.updateComponentTreeUI(this);
   }
-
+  
 //  private void makeSortDialog (final String type)
 //  {
 //    JDialog d = new JDialog (this, "Sort");

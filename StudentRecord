@@ -98,6 +98,13 @@ public class StudentRecord
   private String formatTime (String time)
   {
     time = time.replaceAll(" ","")+time.replaceAll(".","")+time.toUpperCase();
+    if (time.length()==4)
+    {
+      if (Integer.parseInt(time.substring(0,2))>12)
+      time = String.valueOf(Integer.parseInt(time.substring(0,2)) - 12) + time.substring(2) + "PM";
+      else
+        time += "AM";
+    }
     return time.substring(0,2) + ":" + time.substring(2);
   }
   

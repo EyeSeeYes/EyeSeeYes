@@ -14,7 +14,7 @@ import java.io.*;
  * Creates a JPanel with buttons and text fields inside. <p>
  * The user can interact with the buttons and text fields to create, edit, delete, and move between records.
  * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
- * @version 1.1, May 31, 2014
+ * @version 1.1, May 26, 2014
  */
 public class BindrBook extends JPanel implements ActionListener
 {
@@ -100,10 +100,6 @@ public class BindrBook extends JPanel implements ActionListener
   {
     setLayout (new BorderLayout ());
     
-    JToolBar toolBar = new JToolBar ("Still draggable");
-    toolBar.setLayout (new FlowLayout (FlowLayout.CENTER));
-    addButtons (toolBar);
-    
     JPanel p = new JPanel();
     p.setLayout(new BoxLayout (p, BoxLayout.PAGE_AXIS));
     
@@ -153,19 +149,39 @@ public class BindrBook extends JPanel implements ActionListener
     p.add (reason, BorderLayout.LINE_START);
     p.add (inputReason);
     
-    Font myFont = new Font ("Helvetica" , Font.PLAIN , 16);
-    //set font for the JLabels
-    firstName.setFont (myFont);
-    lastName.setFont (myFont);
-    if (isTeacher) 
-      time.setFont (myFont);
-    reason.setFont (myFont);
-    //set font for the textfields
-    inputFirstName.setFont (myFont);
-    inputLastName.setFont (myFont);
-    reason.setFont (myFont);
+    //temp submit button, to be updated.
+    if (!isTeacher)
+    {
+      JButton submitButton = new JButton ("Submit");
+      p.add (submitButton,BorderLayout.LINE_END);
+      submitButton.addActionListener(new ActionListener()
+                                       {
+        public void actionPerformed (ActionEvent e)
+        {
+          System.exit(0);
+        }});
+    }
     
-    add (toolBar, BorderLayout.PAGE_END);
+    Font myFont = new Font ("Helvetica" , Font.PLAIN , 16);
+    setFont(myFont);
+//    //set font for the JLabels
+//    firstName.setFont (myFont);
+//    lastName.setFont (myFont);
+//    if (isTeacher) 
+//      time.setFont (myFont);
+//    reason.setFont (myFont);
+//    //set font for the textfields
+//    inputFirstName.setFont (myFont);
+//    inputLastName.setFont (myFont);
+//    reason.setFont (myFont);
+    
+    if (isTeacher)
+    {
+      JToolBar toolBar = new JToolBar ("Still draggable");
+      toolBar.setLayout (new FlowLayout (FlowLayout.CENTER));
+      addButtons (toolBar);
+      add (toolBar, BorderLayout.PAGE_END);
+    }
     add (p, BorderLayout.CENTER);
     
     currentLayout = true;

@@ -19,7 +19,7 @@ public class BindrDatabase extends JFrame implements ActionListener
    */
   BindrBook b;
   ButtonGroup group, fieldGroup, settingsGroup;
-  boolean isTeacher, isWhole, isSorted, isSelected;
+  boolean isWhole, isSorted, isSelected;
   CardLayout cards = new CardLayout ();
   JPanel cardLayoutPanel = new JPanel (cards);
   BufferedImage img;
@@ -505,26 +505,26 @@ public class BindrDatabase extends JFrame implements ActionListener
 //  }
   
   
-  private void displayLayout (boolean layout, boolean isTeacher, boolean newTable)
+  private void displayLayout (boolean layout, boolean newTable)
   {
     b.removeAll();
     if (layout)
     {
-      b.makeBook(isTeacher);
-      b.displayBook(isTeacher);
+      b.makeBook(true);
+      b.displayBook(true);
     }
     else
     {
-//      if (newTable)
-//        b.createData();
-//      b.makeTable();
+      if (newTable)
+        b.createData();
+      b.makeTable();
     }
     b.updateUI();
   }
   
   
   /**
-   * The actionPerforme method - performs specific tasks corresponding to the menu item selected by the user.
+   * The actionPerformed method - performs specific tasks corresponding to the menu item selected by the user.
    * @param e ActionEvent - stores user input from the class constructor.
    */
   public void actionPerformed (ActionEvent e)
@@ -587,12 +587,12 @@ public class BindrDatabase extends JFrame implements ActionListener
     {
       if (b.students.size()!=0)
         b.currentRecord=0;
-      displayLayout(true, isTeacher, true);
+      displayLayout(true, true);
     }
     
     if (e.getActionCommand ().equals ("Table"))
     {
-      displayLayout(false, isTeacher, true);
+      displayLayout(false, true);
     }
     
 //    if (e.getActionCommand ().equals ("Sort"))

@@ -118,7 +118,7 @@ public class BindrDatabase extends JFrame implements ActionListener
         b = new BindrBook();
         b.makeBook(false);
         add(b);
-        revalidate();
+        validate();
       }});
     
     teacher.setBounds (265, 65, 203, 203);
@@ -152,7 +152,7 @@ public class BindrDatabase extends JFrame implements ActionListener
       {
         remove(cardLayoutPanel);
         makeDatabaseApp ();
-        revalidate();
+        validate();
       }});
     
     back.setBounds (15, 265, 100, 35);

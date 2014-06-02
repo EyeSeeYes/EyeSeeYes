@@ -221,68 +221,68 @@ public class BindrBook extends JPanel implements ActionListener
     return button;
   }
   
-//  public void makeTable ()
-//  {
-//    setLayout (new BorderLayout ());
-//    
-//    String[] columnNames = {"Period" , "Time" , "Name" , "In/Out/Absent" , "Reason"};
-//    
-//    Color lightBlue = new Color (175, 229, 240); //light blue color for the text
-//    Color lightPink = new Color (247, 190, 214); //light pink color for the background
-//    Color lightPurple = new Color (210, 175, 227); //light purple color for the grid lines
-//    
-//    model = new DefaultTableModel (dataValues , columnNames);
-//    table = new JTable (model);
-//    
-//    table.setRowHeight (20);
-//    table.setShowVerticalLines (true);
-//    table.setShowHorizontalLines (true);
-//    
-//    table.setSelectionForeground (Color.green);
-//    table.setSelectionBackground (Color.red);
-//    table.setGridColor (Color.blue);
-//    table.setVisible(true);
-//    
-//    table.getModel().addTableModelListener(new TableModelListener(){
-//      @Override
-//      public void tableChanged(TableModelEvent e) 
-//      {
-//        TableModel model = (TableModel)e.getSource();
-//        int rNum = table.getSelectedRow();
-//        String first = (String)model.getValueAt(rNum,1);
-//        String last = (String)model.getValueAt(rNum,2);
-//        String time = (String)model.getValueAt(rNum,3);
-//        
-//        StudentRecord s = new StudentRecord(first,last,(String)model.getValueAt(rNum,3),time,(String)model.getValueAt(rNum,5));
-//        students.set(rNum,s);
-//        
-//        if(!first.isEmpty())
-//          s.setFirst(first);
-//        if (!last.isEmpty())
-//          s.setLast(last);
-//        if (!time.isEmpty())
-//          s.setTime(time);
-//      }});
-//    
-//    scroll = new JScrollPane (table);
-//    add (scroll, BorderLayout.CENTER);
-//    
-//    currentLayout = false;
-//  }
-//  
-//  public void createData ()
-//  {
-//    dataValues = new String [students.size()] [5];
-//    
-//    for (int y = 0; y < students.size(); y++)
-//    {
-//      dataValues [y][0] = Integer.toString(y+1);
-//      dataValues [y][1] = students.get(y).getFirst();
-//      dataValues [y][2] = students.get(y).getLast();
-//      dataValues [y][3] = students.get(y).getTime();
-//      dataValues [y][4] = students.get(y).getReason();
-//    }
-//  }
+  public void makeTable ()
+  {
+    setLayout (new BorderLayout ());
+    
+    String[] columnNames = {"First Name" , "Last Name" , "Time" , "In/Out/Absent" , "Reason"};
+    
+    Color lightBlue = new Color (175, 229, 240); //light blue color for the text
+    Color lightPink = new Color (247, 190, 214); //light pink color for the background
+    Color lightPurple = new Color (210, 175, 227); //light purple color for the grid lines
+    
+    model = new DefaultTableModel (dataValues , columnNames);
+    table = new JTable (model);
+    
+    table.setRowHeight (20);
+    table.setShowVerticalLines (true);
+    table.setShowHorizontalLines (true);
+    
+    table.setSelectionForeground (Color.green);
+    table.setSelectionBackground (Color.red);
+    table.setGridColor (Color.blue);
+    table.setVisible(true);
+    
+    table.getModel().addTableModelListener(new TableModelListener(){
+      @Override
+      public void tableChanged(TableModelEvent e) 
+      {
+        TableModel model = (TableModel)e.getSource();
+        int rNum = table.getSelectedRow();
+        String first = (String)model.getValueAt(rNum,1);
+        String last = (String)model.getValueAt(rNum,2);
+        String time = (String)model.getValueAt(rNum,3);
+        
+        StudentRecord s = new StudentRecord(first,last,time,(Integer)model.getValueAt(rNum,4),(String)model.getValueAt(rNum,5));
+        students.set(rNum,s);
+        
+        if(!first.isEmpty())
+          s.setFirst(first);
+        if (!last.isEmpty())
+          s.setLast(last);
+        if (!time.isEmpty())
+          s.setTime(time);
+      }});
+    
+    scroll = new JScrollPane (table);
+    add (scroll, BorderLayout.CENTER);
+    
+    currentLayout = false;
+  }
+  
+  public void createData ()
+  {
+    dataValues = new String [students.size()] [5];
+    
+    for (int y = 0; y < students.size(); y++)
+    {
+      dataValues [y][0] = students.get(y).getFirst();
+      dataValues [y][1] = students.get(y).getLast();
+      dataValues [y][2] = students.get(y).getTime();
+      dataValues [y][3] = Integer.toString(students.get(y).getAttendance());
+      dataValues [y][4] = students.get(y).getReason();
+    }
+  }
 //  
 //  public void sort(int field)
 //  {
@@ -610,7 +610,6 @@ public class BindrBook extends JPanel implements ActionListener
         }
       }
     }
-//    
 //    displayBook ();
   }
   

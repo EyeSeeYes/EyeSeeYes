@@ -3,15 +3,14 @@
 /**
  * The class that stores and formats all of the records.
  * @author Angela Jeong
- * @version 1.0, May 28, 2014
+ * @version 2.0, June 5, 2014
  */
 public class StudentRecord
 {
   /**
    * The strings that store the first name, last name, attendance and phone number.
    */
-  private String first, last, time, reason;
-  private int attendance;
+  private String first, last, time, attendance, reason;
   /**
    * The integer that stores the total number of records.
    */
@@ -24,7 +23,7 @@ public class StudentRecord
    * @param attendance int
    * @param phone String
    */
-  public StudentRecord (String first, String last, String time, int attendance, String reason)
+  public StudentRecord (String first, String last, String time, String attendance, String reason)
   {
     this.first = first;
     this.last = last;
@@ -44,7 +43,7 @@ public class StudentRecord
     last = formatName(newName);
   }
   
-  public void setAttendance (int newAttendance)
+  public void setAttendance (String newAttendance)
   {
     attendance = newAttendance;
   }
@@ -69,7 +68,7 @@ public class StudentRecord
     return last;
   }
   
-  public int getAttendance()
+  public String getAttendance()
   {
     return attendance;
   }
@@ -108,4 +107,14 @@ public class StudentRecord
     return time.substring(0,2) + ":" + time.substring(2);
   }
   
+  private String formatAttendance (String attendance)
+  {
+    if (attendance.equals("0") || attendance.toLowerCase().contains("absen"))
+      attendance = "Absent";
+    else if (attendance.equals("1") || attendance.toLowerCase().contains("in"))
+      attendance = "Sign In";
+    else
+      attendance = "Sign Out";
+    return attendance;
+  }
 }

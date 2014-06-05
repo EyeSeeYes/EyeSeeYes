@@ -10,7 +10,7 @@ import java.io.*;
  * The class that runs the program. <p>
  * Creates a new instance of BindrBook and adds it to a window. <p>
  * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
- * @version 4.0, May 31, 2014
+ * @version 5.0, June 5, 2014
  */
 public class BindrDatabase extends JFrame implements ActionListener
 {

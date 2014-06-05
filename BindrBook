@@ -9,12 +9,19 @@ import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
 
+import java.util.Enumeration;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.util.Calendar;
+
 /**
  * The class that handles most of the data and manipulation thereof. <p>
  * Creates a JPanel with buttons and text fields inside. <p>
  * The user can interact with the buttons and text fields to create, edit, delete, and move between records.
  * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
- * @version 1.1, May 26, 2014
+ * @version 4.2, June 5, 2014
  */
 public class BindrBook extends JPanel implements ActionListener
 {
@@ -81,6 +88,11 @@ public class BindrBook extends JPanel implements ActionListener
   static JScrollPane scroll;
   String[][] dataValues;
   
+  StudentRecord s;
+  
+  DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+  Calendar cal = Calendar.getInstance();
+  
   /**
    * The class constructor - Sets up the panel and tool bar and adds them to this JPanel.
    * <p>
@@ -88,7 +100,6 @@ public class BindrBook extends JPanel implements ActionListener
    */
   public BindrBook()
   {
-    //makeBook(false);
   }
   
   /**
@@ -96,7 +107,7 @@ public class BindrBook extends JPanel implements ActionListener
    * Coded by Janelle
    * @param boolean isTeacher
    */
-  public void makeBook (boolean isTeacher)
+  public void makeBook (final boolean isTeacher)
   {
     setLayout (new BorderLayout ());
     
@@ -127,6 +138,9 @@ public class BindrBook extends JPanel implements ActionListener
     {
       p.add (time, BorderLayout.LINE_START);
       p.add (inputTime);
+      cal = Calendar.getInstance();
+      inputTime.setText ((String)dateFormat.format(cal.getTime()));
+      System.out.println(dateFormat.format(cal.getTime()));
     }
     
     p.add (signInButton, BorderLayout.LINE_START);
@@ -143,6 +157,7 @@ public class BindrBook extends JPanel implements ActionListener
     {
       JRadioButton absentButton = new JRadioButton ("Absent");
       p.add (absentButton);
+      signInOutGroup.add (absentButton);
       absentButton.addActionListener (this);
     }
     
@@ -157,23 +172,12 @@ public class BindrBook extends JPanel implements ActionListener
       submitButton.addActionListener(new ActionListener()
                                        {
         public void actionPerformed (ActionEvent e)
-        {
-          System.exit(0);
+{
+          submitRecord(false);
         }});
     }
     
-    Font myFont = new Font ("Helvetica" , Font.PLAIN , 16);
-    setFont(myFont);
-//    //set font for the JLabels
-//    firstName.setFont (myFont);
-//    lastName.setFont (myFont);
-//    if (isTeacher) 
-//      time.setFont (myFont);
-//    reason.setFont (myFont);
-//    //set font for the textfields
-//    inputFirstName.setFont (myFont);
-//    inputLastName.setFont (myFont);
-//    reason.setFont (myFont);
+    setFont(new Font ("Helvetica" , Font.PLAIN , 16));
     
     if (isTeacher)
     {
@@ -188,6 +192,32 @@ public class BindrBook extends JPanel implements ActionListener
     displayBook(isTeacher);
   }
   
+  private void submitRecord(boolean isTeacher)
+  {
+    cal = Calendar.getInstance();
+    
+    s = new StudentRecord (inputFirstName.getText(), inputLastName.getText() , getSelectedButtonText(signInOutGroup), dateFormat.format(cal.getTime()),inputReason.getText());
+    
+    if (!isTeacher || (isTeacher && currentRecord==-1))
+      students.add(s);
+    else
+      students.set(currentRecord,s);
+  }
+  
+    public String getSelectedButtonText(ButtonGroup signInOutGroup) 
+  {
+    for (Enumeration<AbstractButton> buttons = signInOutGroup.getElements(); buttons.hasMoreElements();) 
+    {
+      AbstractButton button = buttons.nextElement();
+      
+      if (button.isSelected()) 
+      {
+        return button.getText();
+      }
+    }
+    return null;
+  }
+    
   protected void addButtons (JToolBar toolBar)
   {
     JButton button = null;
@@ -226,6 +256,10 @@ public class BindrBook extends JPanel implements ActionListener
     setLayout (new BorderLayout ());
     
     String[] columnNames = {"First Name" , "Last Name" , "Time" , "In/Out/Absent" , "Reason"};
+    String[][] tempValues = {{"Angela", "Jeong", "2:30", "Sign In", "Because"},
+      {"Lucas", "Lee", "3:00", "Sign Out", "Why not"},
+      {"Janelle", "Sookhai", "2:00", "Sign In", "Early"},
+      {"Nathan", "Can't Spell", "--", "Absent", "Skipped?"}};
     
     Color lightBlue = new Color (175, 229, 240); //light blue color for the text
     Color lightPink = new Color (247, 190, 214); //light pink color for the background
@@ -253,7 +287,7 @@ public class BindrBook extends JPanel implements ActionListener
         String last = (String)model.getValueAt(rNum,2);
         String time = (String)model.getValueAt(rNum,3);
         
-        StudentRecord s = new StudentRecord(first,last,time,(Integer)model.getValueAt(rNum,4),(String)model.getValueAt(rNum,5));
+        StudentRecord s = new StudentRecord(first,last,time,(String)model.getValueAt(rNum,4),(String)model.getValueAt(rNum,5));
         students.set(rNum,s);
         
         if(!first.isEmpty())
@@ -279,11 +313,11 @@ public class BindrBook extends JPanel implements ActionListener
       dataValues [y][0] = students.get(y).getFirst();
       dataValues [y][1] = students.get(y).getLast();
       dataValues [y][2] = students.get(y).getTime();
-      dataValues [y][3] = Integer.toString(students.get(y).getAttendance());
+      dataValues [y][3] = students.get(y).getAttendance();
       dataValues [y][4] = students.get(y).getReason();
     }
   }
-//  
+
 //  public void sort(int field)
 //  {
 //    int[] array = new int[students.size()];
@@ -531,67 +565,7 @@ public class BindrBook extends JPanel implements ActionListener
     
     else if (SUBMIT.equals (cmd))
     {
-//      String first = inputFirstName.getText();
-//      String last = inputLastName.getText();
-//      String reason = inputReason.getText();
-//      StudentRecord s = new StudentRecord (first,last,time,reason);
-//      
-//      outerIf:
-//        if (first.isEmpty()&&last.isEmpty()&&reason.isEmpty())
-//        JOptionPane.showMessageDialog (this, "Please enter at least one field", "ERROR", JOptionPane.ERROR_MESSAGE);
-//        
-//        else
-//        {
-//          if (!time.isEmpty())
-//          {
-//            if (DataCheck.checkTime(time)!=0)
-//            {
-//              if (DataCheck.checkTime(time)==1)
-//                JOptionPane.showMessageDialog (this, "Time must contain one '@' symbol.", "Time", JOptionPane.ERROR_MESSAGE);
-//              
-//              else if (DataCheck.checkTime(time)==2)
-//                JOptionPane.showMessageDialog (this, "Time can only contain alpha-numeric characters, periods, dashes, underscores, and a '@' symbol.", "Time", JOptionPane.ERROR_MESSAGE);
-//              
-//              else if (DataCheck.checkTime(time)==3)
-//                JOptionPane.showMessageDialog (this, "There must be characters before and after the '@' symbol.", "Time", JOptionPane.ERROR_MESSAGE);
-//              
-//              break outerIf;
-//            }
-//          }
-//          if (!reason.isEmpty())
-//          {
-//            if (DataCheck.checkReason(reason)!=0)
-//            {
-//              if (DataCheck.checkReason(reason)==1)
-//                JOptionPane.showMessageDialog (this, "Reason number must be 10 digits long, with 2 dashes or spaces, if any.", "Reason", JOptionPane.ERROR_MESSAGE);
-//              
-//              else if (DataCheck.checkReason(reason)==2)
-//                JOptionPane.showMessageDialog (this, "Reason number can only contain digits, dashes and spaces.", "Reason", JOptionPane.ERROR_MESSAGE);
-//              
-//              else if (DataCheck.checkReason(reason)==3)
-//                JOptionPane.showMessageDialog (this, "Any dashes or spaces must be in the correct placements.", "Reason", JOptionPane.ERROR_MESSAGE);
-//              
-//              break outerIf;
-//            }
-//          }
-//          
-//          if (currentRecord == -1)
-//          {
-//            students.add(s);
-//            currentRecord = students.size()-1;
-//          }
-//          else
-//            students.set(currentRecord,s);
-//          
-//          if (!first.isEmpty())
-//            s.setFirst(first);
-//          if (!last.isEmpty())
-//            s.setLast(last);
-//          if (!reason.isEmpty())
-//            s.setReason(reason);
-//          
-//          isSaved = false;
-//        }
+      submitRecord(true);
     }
     else
     {

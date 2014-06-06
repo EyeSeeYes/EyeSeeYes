@@ -10,7 +10,7 @@ import java.io.*;
  * The class that runs the program. <p>
  * Creates a new instance of BindrBook and adds it to a window. <p>
  * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
- * @version 5.0, June 5, 2014
+ * @version 4.0, May 31, 2014
  */
 public class BindrDatabase extends JFrame implements ActionListener
 {
@@ -19,12 +19,13 @@ public class BindrDatabase extends JFrame implements ActionListener
    */
   BindrBook b;
   ButtonGroup group, fieldGroup, settingsGroup;
-  boolean isTeacher, isWhole, isSorted, isSelected;
+  boolean isWhole, isSorted, isSelected;
   CardLayout cards = new CardLayout ();
   JPanel cardLayoutPanel = new JPanel (cards);
   BufferedImage img;
-  JTextField usernameField = new JTextField ();
-  JPasswordField passwordField = new JPasswordField ();
+  JTextField usernameField = new JTextField (); 
+  JPasswordField passwordField = new JPasswordField (); 
+  
   /**
    * The class constructor - Creates a new instance of BindrBook and adds it to a window.
    * Coded by Angela
@@ -32,7 +33,6 @@ public class BindrDatabase extends JFrame implements ActionListener
    */
   public BindrDatabase()
   {
-    super ("Bindr");
     setSize (500, 350);
     setResizable(false);
     setLocationRelativeTo(null);
@@ -100,7 +100,8 @@ public class BindrDatabase extends JFrame implements ActionListener
     JLabel password = new JLabel ("Password: ");
     JButton signIn = new JButton ("Sign In");
     JButton back = new JButton ("Back");
-    
+    usernameField = new JTextField ();
+    passwordField = new JPasswordField ();
     final JPanel openBindrPanel = new JPanel (null);
     final JPanel loginScreensPanel = new JPanel (null);
     
@@ -147,19 +148,15 @@ public class BindrDatabase extends JFrame implements ActionListener
     passwordField.setBounds (135, 178, 200, 25);
     
     signIn.setBounds (250, 250, 200, 50);
-    signIn.addActionListener (new ActionListener ()
-                                {
-      public void actionPerformed (ActionEvent e)
-      {
-        if (canSignIn(usernameField.getText(),passwordField.getText()))
-        {
-          remove(cardLayoutPanel);
-          makeDatabaseApp ();
-          validate();
-        }
-        //else
-        {
-          //give error message 
+    signIn.addActionListener (new ActionListener () 
+                                { 
+      public void actionPerformed (ActionEvent e) 
+      { 
+        if (canSignIn(usernameField.getText(),passwordField.getText())) 
+        { 
+          remove(cardLayoutPanel); 
+          makeDatabaseApp (); 
+          validate(); 
         }
       }});
     
@@ -179,6 +176,7 @@ public class BindrDatabase extends JFrame implements ActionListener
     loginScreensPanel. add (back);
     cardLayoutPanel.add (openBindrPanel, "OP");
   }
+  
   
   protected boolean canSignIn (String userName, String passWord)
   {
@@ -225,6 +223,80 @@ public class BindrDatabase extends JFrame implements ActionListener
       JOptionPane.showMessageDialog (this, "Incorrect username or password", "?", JOptionPane.ERROR_MESSAGE);
     }
     return false; 
+  }
+  
+  /**
+   * Makes the settings screen where the user can change their username and/or password.
+   * 
+   * @author Janelle Sookhai
+   * 
+   * @param newUsernameLabel - JLabel for the new username field.<br>
+   * @param currentPasswordLabel - JLabel for the current password password field.<br>
+   * @param newPasswordLabel - JLabel for the new password password field.<br>
+   * @param confirmNewPasswordLabel - JLabel for the second password password field. Intened to confirm the new password.<br>
+   * @param inputNewUsername - JTextField for the user to input their desired new username.<br>
+   * @param inputCurrentPassword - JPasswordField for the user to input their current password. Intened for users to only
+   * be able to change their own passwords.<br>
+   * @param inputNewPassword - JPasswordField for the user to input their desired new password.<br>
+   * @param inputConfirmNewPassword - JPasswordField for the user to input their desired new password a second time. Intended
+   * to confirm the user's new password.<br>
+   * 
+   */ 
+  public void userSettings ()
+  {
+    System.out.println ("userSettings beginning");
+    remove(b);
+    validate();
+    final JPanel userSettingsPanel = new JPanel (null);
+    
+    
+    JLabel newUsernameLabel = new JLabel ("New username: ");
+    JLabel currentPasswordLabel = new JLabel ("Current password: ");
+    JLabel newPasswordLabel = new JLabel ("New password: ");
+    JLabel confirmNewPasswordLabel = new JLabel ("Confirm new password: ");
+    
+    JTextField  inputNewUsername = new JTextField(10);
+    JPasswordField inputCurrentPassword = new JPasswordField(10);
+    JPasswordField  inputNewPassword = new JPasswordField(10);
+    JPasswordField  inputConfirmNewPassword = new JPasswordField(10);
+    
+    JButton cancelUserSettingsButton = new JButton("Cancel");
+    JButton submitUserSettingsButton = new JButton("Submit");
+    
+    cancelUserSettingsButton.addActionListener (new ActionListener ()
+                                                  {
+      public void actionPerformed (ActionEvent e)
+      {
+        System.out.println("cancel user settings test");
+        remove(userSettingsPanel);
+        makeDatabaseApp ();
+        validate();
+      }});
+    
+    submitUserSettingsButton.addActionListener (new ActionListener ()
+                                                  {
+      public void actionPerformed (ActionEvent e)
+      {
+        System.out.println("submit user settings test");
+      }});
+    
+    userSettingsPanel.setLayout (new FlowLayout ());
+    userSettingsPanel.add(newUsernameLabel);
+    userSettingsPanel.add(inputNewUsername);
+    userSettingsPanel.add(currentPasswordLabel);
+    userSettingsPanel.add(inputCurrentPassword);
+    userSettingsPanel.add (newPasswordLabel);
+    userSettingsPanel.add (inputNewPassword);
+    userSettingsPanel.add (confirmNewPasswordLabel);
+    userSettingsPanel.add (inputConfirmNewPassword);
+    userSettingsPanel.add (cancelUserSettingsButton);
+    userSettingsPanel.add (submitUserSettingsButton);
+    
+    add(userSettingsPanel);
+    
+    userSettingsPanel.validate();
+    validate();
+    System.out.println ("userSettings end");
   }
   
   /**
@@ -540,24 +612,24 @@ public class BindrDatabase extends JFrame implements ActionListener
 //    d.setLocationRelativeTo (this);
 //    d.setVisible (true);
 //  }
-//  
-//  private void checkIsSaved ()
-//  {
-//    int confirm;
-//    
-//    if (b.isSaved == false)
-//    {
-//      confirm = JOptionPane.showConfirmDialog (b, "The file you are currently on is not saved. Save this file?", "Unsaved File", JOptionPane.YES_NO_CANCEL_OPTION);
-//      
-//      if (confirm == JOptionPane.YES_OPTION)
-//        b.saveFile(false, b.currentFile);
-//      else
-//      {
-//        if (confirm == JOptionPane.NO_OPTION)
-//          b.isSaved = true;
-//      }
-//    }
-//  }
+  
+  private void checkIsSaved ()
+  {
+    int confirm;
+    
+    if (b.isSaved == false)
+    {
+      confirm = JOptionPane.showConfirmDialog (b, "The file you are currently on is not saved. Save this file?", "Unsaved File", JOptionPane.YES_NO_CANCEL_OPTION);
+      
+      if (confirm == JOptionPane.YES_OPTION)
+        b.saveFile(false, b.currentFile);
+      else
+      {
+        if (confirm == JOptionPane.NO_OPTION)
+          b.isSaved = true;
+      }
+    }
+  }
   
   
   private void displayLayout (boolean layout, boolean newTable)
@@ -579,7 +651,7 @@ public class BindrDatabase extends JFrame implements ActionListener
   
   
   /**
-   * The actionPerforme method - performs specific tasks corresponding to the menu item selected by the user.
+   * The actionPerformed method - performs specific tasks corresponding to the menu item selected by the user.
    * @param e ActionEvent - stores user input from the class constructor.
    */
   public void actionPerformed (ActionEvent e)
@@ -588,55 +660,55 @@ public class BindrDatabase extends JFrame implements ActionListener
     {
       System.exit (0);
     }
-//    
-//    if (e.getActionCommand ().equals ("New"))
-//    {
-//      checkIsSaved();
-//      if (b.isSaved)
-//      {
-//        b.newFile();
-//        displayLayout(b.currentLayout,true);
-//        setTitle("Untitled");
-//        b.updateUI();
-//      }
-//    }
-//    
-//    if (e.getActionCommand ().equals ("Open"))
-//    {
-//      checkIsSaved();
-//      if (b.isSaved)
-//      {
-//        b.openFile();
-//        displayLayout(b.currentLayout,true);
-//        setTitle(b.currentFile.getName());
-//        b.updateUI();
-//      }
-//    }
-//    
-//    if (e.getActionCommand ().equals ("Save"))
-//    {
-//      if (b.students.isEmpty())
-//        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
-//      else
-//      {
-//        if (!b.currentLayout)
-//          b.saveTable();
-//        b.saveFile(false, b.currentFile);
-//      }
-//    }
-//    
-//    if (e.getActionCommand ().equals ("Save As"))
-//    {
-//      if (b.students.isEmpty())
-//        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
-//      else
-//      {
-//        if (!b.currentLayout)
-//          b.saveTable();
-//        b.saveAs();
-//        setTitle(b.currentFile.getName());
-//      }
-//    }
+    
+    if (e.getActionCommand ().equals ("New"))
+    {
+      checkIsSaved();
+      if (b.isSaved)
+      {
+        b.newFile();
+        displayLayout(b.currentLayout,true);
+        setTitle("Untitled");
+        b.updateUI();
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Open"))
+    {
+      checkIsSaved();
+      if (b.isSaved)
+      {
+        b.openFile();
+        displayLayout(b.currentLayout,true);
+        setTitle(b.currentFile.getName());
+        b.updateUI();
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Save"))
+    {
+      if (b.students.isEmpty())
+        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        if (!b.currentLayout)
+          b.saveTable();
+        b.saveFile(false, b.currentFile);
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Save As"))
+    {
+      if (b.students.isEmpty())
+        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        if (!b.currentLayout)
+          b.saveTable();
+        b.saveAs();
+        setTitle(b.currentFile.getName());
+      }
+    }
     
     if (e.getActionCommand ().equals ("Bindr Book"))
     {

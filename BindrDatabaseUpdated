@@ -116,12 +116,32 @@ public class BindrDatabase extends JFrame implements ActionListener
     JLabel newPasswordLabel = new JLabel ("New password: ");
     JLabel confirmNewPasswordLabel = new JLabel ("Confirm new password: ");
     
-    JTextField  inputNewUsername = new JTextField ();
-    JPasswordField inputCurrentPassword = new JPasswordField ();
-    JPasswordField  inputNewPassword = new JPasswordField ();
-    JPasswordField  inputConfirmNewPassword = new JPasswordField ();
+    JTextField  inputNewUsername = new JTextField(10);
+    JPasswordField inputCurrentPassword = new JPasswordField(10);
+    JPasswordField  inputNewPassword = new JPasswordField(10);
+    JPasswordField  inputConfirmNewPassword = new JPasswordField(10);
     
-    userSettingsPanel.setLayout (new ));
+    JButton cancelUserSettingsButton = new JButton("Cancel");
+    JButton submitUserSettingsButton = new JButton("Submit");
+    
+    cancelUserSettingsButton.addActionListener (new ActionListener ()
+                                                  {
+      public void actionPerformed (ActionEvent e)
+      {
+        System.out.println("cancel user settings test");
+        remove(userSettingsPanel);
+        makeDatabaseApp ();
+        validate();
+      }});
+    
+    submitUserSettingsButton.addActionListener (new ActionListener ()
+                                                  {
+      public void actionPerformed (ActionEvent e)
+      {
+        System.out.println("submit user settings test");
+      }});
+    
+    userSettingsPanel.setLayout (new FlowLayout ());
     userSettingsPanel.add(newUsernameLabel);
     userSettingsPanel.add(inputNewUsername);
     userSettingsPanel.add(currentPasswordLabel);
@@ -130,11 +150,15 @@ public class BindrDatabase extends JFrame implements ActionListener
     userSettingsPanel.add (inputNewPassword);
     userSettingsPanel.add (confirmNewPasswordLabel);
     userSettingsPanel.add (inputConfirmNewPassword);
+    userSettingsPanel.add (cancelUserSettingsButton);
+    userSettingsPanel.add (submitUserSettingsButton);
+    
     add(userSettingsPanel);
+    
     userSettingsPanel.validate();
     validate();
     System.out.println ("userSettings end");
-    }
+  }
   
   /**
    * makes the access levels screen thing with student and teacher on it
@@ -755,4 +779,4 @@ public class BindrDatabase extends JFrame implements ActionListener
   {
     new BindrDatabase();
   } // main method
-  }
+}

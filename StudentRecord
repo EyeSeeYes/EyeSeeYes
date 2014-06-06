@@ -10,7 +10,7 @@ public class StudentRecord
   /**
    * The strings that store the first name, last name, attendance and phone number.
    */
-  private String first, last, time, attendance, reason;
+  private String first, last, attendance, time, reason;
   /**
    * The integer that stores the total number of records.
    */
@@ -23,7 +23,7 @@ public class StudentRecord
    * @param attendance int
    * @param phone String
    */
-  public StudentRecord (String first, String last, String time, String attendance, String reason)
+  public StudentRecord (String first, String last, String attendance, String time, String reason)
   {
     this.first = first;
     this.last = last;
@@ -94,6 +94,17 @@ public class StudentRecord
     return newName.substring(0,newName.length()-1);
   }
   
+  private String formatAttendance (String attendance)
+  {
+    if (attendance.equals("0") || attendance.toLowerCase().contains("absen"))
+      attendance = "Absent";
+    else if (attendance.equals("1") || attendance.toLowerCase().contains("in"))
+      attendance = "Sign In";
+    else
+      attendance = "Sign Out";
+    return attendance;
+  }
+  
   private String formatTime (String time)
   {
     time = time.replaceAll(" ","")+time.replaceAll(".","")+time.toUpperCase();
@@ -105,16 +116,5 @@ public class StudentRecord
         time += "AM";
     }
     return time.substring(0,2) + ":" + time.substring(2);
-  }
-  
-  private String formatAttendance (String attendance)
-  {
-    if (attendance.equals("0") || attendance.toLowerCase().contains("absen"))
-      attendance = "Absent";
-    else if (attendance.equals("1") || attendance.toLowerCase().contains("in"))
-      attendance = "Sign In";
-    else
-      attendance = "Sign Out";
-    return attendance;
   }
 }

@@ -244,7 +244,6 @@ public class BindrDatabase extends JFrame implements ActionListener
    */ 
   public void userSettings ()
   {
-    System.out.println ("userSettings beginning");
     remove(b);
     validate();
     final JPanel userSettingsPanel = new JPanel (null);
@@ -267,7 +266,6 @@ public class BindrDatabase extends JFrame implements ActionListener
                                                   {
       public void actionPerformed (ActionEvent e)
       {
-        System.out.println("cancel user settings test");
         remove(userSettingsPanel);
         makeDatabaseApp ();
         validate();
@@ -277,7 +275,10 @@ public class BindrDatabase extends JFrame implements ActionListener
                                                   {
       public void actionPerformed (ActionEvent e)
       {
-        System.out.println("submit user settings test");
+        //to fix
+        remove(userSettingsPanel);
+        makeDatabaseApp ();
+        validate();
       }});
     
     userSettingsPanel.setLayout (new FlowLayout ());
@@ -296,7 +297,6 @@ public class BindrDatabase extends JFrame implements ActionListener
     
     userSettingsPanel.validate();
     validate();
-    System.out.println ("userSettings end");
   }
   
   /**
@@ -319,10 +319,12 @@ public class BindrDatabase extends JFrame implements ActionListener
     JMenuItem tableItem = new JMenuItem ("Table");
     JMenuItem sortItem = new JMenuItem ("Sort");
     JMenuItem searchItem = new JMenuItem ("Search");
+    JMenuItem userSettingsItem = new JMenuItem ("User Settings");
     
     JMenu fileMenu = new JMenu ("File");
     JMenu displayMenu = new JMenu ("Display");
     JMenu sortSearchMenu = new JMenu ("Sort/Search");
+    JMenu settingsMenu  = new JMenu ("Settings");
     JMenuBar myMenus = new JMenuBar ();
     
     fileMenu.add (newItem);
@@ -334,9 +336,11 @@ public class BindrDatabase extends JFrame implements ActionListener
     displayMenu.add (tableItem);
     sortSearchMenu.add (sortItem);
     sortSearchMenu.add(searchItem);
+    settingsMenu.add (userSettingsItem);
     myMenus.add (fileMenu);
     myMenus.add (displayMenu);
-    myMenus.add(sortSearchMenu);
+    myMenus.add(sortSearchMenu);;
+    myMenus.add (settingsMenu);
     setJMenuBar (myMenus);
     
     newItem.addActionListener (this);
@@ -348,270 +352,298 @@ public class BindrDatabase extends JFrame implements ActionListener
     tableItem.addActionListener (this);
     sortItem.addActionListener(this);
     searchItem.addActionListener(this);
+    userSettingsItem.addActionListener (this);
     
     SwingUtilities.updateComponentTreeUI(this);
   }
   
-//  private void makeSortDialog (final String type)
-//  {
-//    JDialog d = new JDialog (this, "Sort");
-//    isSelected = false;
-//    
-//    d.setSize (250,100);
-//    d.setResizable (false);
-//    d.setLayout (new FlowLayout());
-//    
-//    JLabel label = new JLabel ("Sort By:");
-//    group = new ButtonGroup ();
-//    JRadioButton firstButton = new JRadioButton ("First Name");
-//    firstButton.addActionListener (new ActionListener()
-//                                     {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        if (isSorted)
-//        {
-//          isSorted = false;
-//          b.createData();
-//          group.clearSelection();
-//        }
-//        else
-//        {
-//            b.sort(1);
-//            isSorted = true;
-//        }
-//        displayLayout(false,false);
-//      }
-//    });
-//    
-//    JRadioButton lastButton = new JRadioButton ("Last Name");
-//    lastButton.addActionListener (new ActionListener()
-//                                    {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        if (isSorted)
-//        {
-//          isSorted = false;
-//          b.createData();
-//          group.clearSelection();
-//        }
-//        else
-//        {
-//            b.sort(2);
-//          isSorted = true;
-//        }
-//        displayLayout(false,false);
-//      }
-//    });
-//    
-//    JRadioButton timeButton = new JRadioButton ("Time");
-//    timeButton.addActionListener (new ActionListener()
-//                                    {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        if (isSorted)
-//        {
-//          isSorted = false;
-//          b.createData();
-//          group.clearSelection();
-//        }
-//        else
-//        {
-//            b.sort(3);
-//          isSorted = true;
-//        }
-//        displayLayout(false,false);
-//      }
-//    });
-//    
-//    JRadioButton attendanceButton = new JRadioButton ("Attendance");
-//    attendanceButton.addActionListener (new ActionListener()
-//                                      {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        if (isSorted)
-//        {
-//          isSorted = false;
-//          b.createData();
-//          group.clearSelection();
-//        }
-//        else
-//        {
-//            b.sort(4);
-//          isSorted = true;
-//        }
-//        displayLayout(false,false);
-//      }
-//    });
-//    
-//    group.add(firstButton);
-//    group.add(lastButton);
-//    group.add(timeButton);
-//    group.add(attendanceButton);
-//    
-//    d.add(label);
-//    d.add(firstButton);
-//    d.add(lastButton);
-//    d.add(timeButton);
-//    d.add(attendanceButton);
-//    d.setLocationRelativeTo (this);
-//    d.setVisible (true);
-//  }
-//  
-//  
-//  private void makeSearchDialog()
-//  {
-//    JDialog d = new JDialog (this, "Search");
-//    isSelected = false;
-//    isWhole = true;
-//    
-//    d.setSize (300,200);
-//    d.setResizable (false);
-//    d.setLayout (new FlowLayout());
-//    
-//    JLabel matchLabel = new JLabel ("Search for:");
-//    final JTextField text = new JTextField (20);
-//    
-//    settingsGroup = new ButtonGroup ();
-//    JRadioButton partialButton = new JRadioButton ("Partial Match");
-//    partialButton.setSelected(true);
-//    partialButton.addActionListener (new ActionListener()
-//                                       {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        isWhole=false;
-//      }
-//    });
-//    
-//    JRadioButton wholeButton = new JRadioButton ("Match Whole Word");
-//    wholeButton.addActionListener (new ActionListener()
-//                                     {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        isWhole=true;
-//      }
-//    });
-//    
-//    JLabel fieldLabel = new JLabel ("Search In:");
-//    fieldGroup = new ButtonGroup ();
-//    JRadioButton firstButton = new JRadioButton ("First Name");
-//    firstButton.addActionListener (new ActionListener()
-//                                     {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        if (isSelected)
-//        {
-//          isSelected = false;
-//          isSorted = false;
-//          b.createData();
-//          fieldGroup.clearSelection();
-//        }
-//        else
-//        {
-//          if (!isSorted)
-//          {
-//            b.search(1,1,isWhole,text.getText());
-//            System.out.println(text.getText());
-//          }
-//          else
-//            b.search(2,1,isWhole,text.getText());
-//          isSelected = true;
-//        }
-//        displayLayout(false,false);
-//      }
-//    });
-//    
-//    JRadioButton lastButton = new JRadioButton ("Last Name");
-//    lastButton.addActionListener (new ActionListener()
-//                                    {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        if (isSelected)
-//        {
-//          isSelected = false;
-//          isSorted = false;
-//          b.createData();
-//          fieldGroup.clearSelection();
-//        }
-//        else
-//        {
-//          if (!isSorted)
-//            b.search(1,2,isWhole,text.getText());
-//          else
-//            b.search(2,2,isWhole,text.getText());
-//          isSelected = true;
-//        }
-//        displayLayout(false,false);
-//      }
-//    });
-//    
-//    JRadioButton timeButton = new JRadioButton ("Time");
-//    timeButton.addActionListener (new ActionListener()
-//                                    {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        if (isSelected)
-//        {
-//          isSelected = false;
-//          isSorted = false;
-//          b.createData();
-//          fieldGroup.clearSelection();
-//        }
-//        else
-//        {
-//          if (!isSorted)
-//            b.search(1,3,isWhole,text.getText());
-//          else
-//            b.search(2,3,isWhole,text.getText());
-//          isSelected = true;
-//        }
-//        displayLayout(false,false);
-//      }
-//    });
-//    
-//    JRadioButton reasonButton = new JRadioButton ("Reason");
-//    reasonButton.addActionListener (new ActionListener()
-//                                      {
-//      public void actionPerformed (ActionEvent e)
-//      {
-//        if (isSelected)
-//        {
-//          isSelected = false;
-//          isSorted = false;
-//          b.createData();
-//          fieldGroup.clearSelection();
-//        }
-//        else
-//        {
-//          if (!isSorted)
-//            b.search(1,4,isWhole,text.getText());
-//          else
-//            b.search(2,4,isWhole,text.getText());
-//          isSelected = true;
-//        }
-//        displayLayout(false,false);
-//      }
-//    });
-//    
-//    settingsGroup.add(partialButton);
-//    settingsGroup.add(wholeButton);
-//    
-//    fieldGroup.add(firstButton);
-//    fieldGroup.add(lastButton);
-//    fieldGroup.add(timeButton);
-//    fieldGroup.add(reasonButton);
-//    
-//    d.add(matchLabel);
-//    d.add(text);
-//    d.add(partialButton);
-//    d.add(wholeButton);
-//    d.add(fieldLabel);
-//    d.add(firstButton);
-//    d.add(lastButton);
-//    d.add(timeButton);
-//    d.add(reasonButton);
-//    d.setLocationRelativeTo (this);
-//    d.setVisible (true);
-//  }
+  private void makeSortDialog (final String type)
+  {
+    JDialog d = new JDialog (this, "Sort");
+    isSelected = false;
+    
+    d.setSize (250,100);
+    d.setResizable (false);
+    d.setLayout (new FlowLayout());
+    
+    JLabel label = new JLabel ("Sort By:");
+    group = new ButtonGroup ();
+    JRadioButton firstButton = new JRadioButton ("First Name");
+    firstButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSorted)
+        {
+          isSorted = false;
+          b.createData();
+          group.clearSelection();
+        }
+        else
+        {
+            b.sort(0);
+            isSorted = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton lastButton = new JRadioButton ("Last Name");
+    lastButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSorted)
+        {
+          isSorted = false;
+          b.createData();
+          group.clearSelection();
+        }
+        else
+        {
+            b.sort(1);
+          isSorted = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton attendanceButton = new JRadioButton ("Attendance");
+    attendanceButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSorted)
+        {
+          isSorted = false;
+          b.createData();
+          group.clearSelection();
+        }
+        else
+        {
+            b.sort(2);
+          isSorted = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton timeButton = new JRadioButton ("Time");
+    timeButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSorted)
+        {
+          isSorted = false;
+          b.createData();
+          group.clearSelection();
+        }
+        else
+        {
+            b.sort(3);
+          isSorted = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton reasonButton = new JRadioButton ("Reason");
+    timeButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSorted)
+        {
+          isSorted = false;
+          b.createData();
+          group.clearSelection();
+        }
+        else
+        {
+            b.sort(4);
+          isSorted = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    group.add(firstButton);
+    group.add(lastButton);
+    group.add(timeButton);
+    group.add(attendanceButton);
+    
+    d.add(label);
+    d.add(firstButton);
+    d.add(lastButton);
+    d.add(timeButton);
+    d.add(attendanceButton);
+    d.setLocationRelativeTo (this);
+    d.setVisible (true);
+  }
+  
+  
+  private void makeSearchDialog()
+  {
+    JDialog d = new JDialog (this, "Search");
+    isSelected = false;
+    isWhole = true;
+    
+    d.setSize (300,200);
+    d.setResizable (false);
+    d.setLayout (new FlowLayout());
+    
+    JLabel matchLabel = new JLabel ("Search for:");
+    final JTextField text = new JTextField (20);
+    
+    settingsGroup = new ButtonGroup ();
+    JRadioButton partialButton = new JRadioButton ("Partial Match");
+    partialButton.setSelected(true);
+    partialButton.addActionListener (new ActionListener()
+                                       {
+      public void actionPerformed (ActionEvent e)
+      {
+        isWhole=false;
+      }
+    });
+    
+    JRadioButton wholeButton = new JRadioButton ("Match Whole Word");
+    wholeButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        isWhole=true;
+      }
+    });
+    
+    JLabel fieldLabel = new JLabel ("Search In:");
+    fieldGroup = new ButtonGroup ();
+    JRadioButton firstButton = new JRadioButton ("First Name");
+    firstButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSelected)
+        {
+          isSelected = false;
+          isSorted = false;
+          b.createData();
+          fieldGroup.clearSelection();
+        }
+        else
+        {
+            b.search(0,isWhole,text.getText());
+            System.out.println(text.getText());
+          isSelected = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton lastButton = new JRadioButton ("Last Name");
+    lastButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSelected)
+        {
+          isSelected = false;
+          isSorted = false;
+          b.createData();
+          fieldGroup.clearSelection();
+        }
+        else
+        {
+            b.search(1,isWhole,text.getText());
+          isSelected = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton attendanceButton = new JRadioButton ("Attendance");
+    attendanceButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSelected)
+        {
+          isSelected = false;
+          isSorted = false;
+          b.createData();
+          fieldGroup.clearSelection();
+        }
+        else
+        {
+            b.search(2,isWhole,text.getText());
+          isSelected = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton timeButton = new JRadioButton ("Time");
+    timeButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSelected)
+        {
+          isSelected = false;
+          isSorted = false;
+          b.createData();
+          fieldGroup.clearSelection();
+        }
+        else
+        {
+            b.search(3,isWhole,text.getText());
+          isSelected = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton reasonButton = new JRadioButton ("Reason");
+    reasonButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (isSelected)
+        {
+          isSelected = false;
+          isSorted = false;
+          b.createData();
+          fieldGroup.clearSelection();
+        }
+        else
+        {
+            b.search(4,isWhole,text.getText());
+          isSelected = true;
+        }
+        displayLayout(false,false);
+      }
+    });
+    
+    settingsGroup.add(partialButton);
+    settingsGroup.add(wholeButton);
+    
+    fieldGroup.add(firstButton);
+    fieldGroup.add(lastButton);
+    fieldGroup.add(timeButton);
+    fieldGroup.add(reasonButton);
+    
+    d.add(matchLabel);
+    d.add(text);
+    d.add(partialButton);
+    d.add(wholeButton);
+    d.add(fieldLabel);
+    d.add(firstButton);
+    d.add(lastButton);
+    d.add(timeButton);
+    d.add(reasonButton);
+    d.setLocationRelativeTo (this);
+    d.setVisible (true);
+  }
   
   private void checkIsSaved ()
   {
@@ -722,19 +754,25 @@ public class BindrDatabase extends JFrame implements ActionListener
       displayLayout(false, true);
     }
     
-//    if (e.getActionCommand ().equals ("Sort"))
-//    {
-//      if (b.currentLayout)
-//        displayLayout(false,true);
-//      makeSortDialog("Sort");
-//    }
-//    
-//    if (e.getActionCommand ().equals ("Search"))
-//    {
-//      if (b.currentLayout)
-//        displayLayout(false,true);
-//      makeSearchDialog();
-//    }
+    if (e.getActionCommand ().equals ("Sort"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSortDialog("Sort");
+    }
+    
+    if (e.getActionCommand ().equals ("Search"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSearchDialog();
+    }
+    
+    else if (e.getActionCommand ().equals ("User Settings"))
+    {
+      b.removeAll();
+      userSettings();
+    }
   }
   
   /**

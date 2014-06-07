@@ -62,9 +62,9 @@ public class BindrBook extends JPanel implements ActionListener
    */
   static JTextField inputLastName;
   
-  static JTextField inputTime;
-  
   static ButtonGroup signInOutGroup;
+  
+  static JTextField inputTime;
   /**
    * The text field which will receive input for the reason number.
    */
@@ -90,8 +90,10 @@ public class BindrBook extends JPanel implements ActionListener
   
   StudentRecord s;
   
-  DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
-  Calendar cal = Calendar.getInstance();
+  Calendar cal;
+  DateFormat dateFormat;
+  //= new SimpleDateFormat("hh:mm a");
+  //= Calendar.getInstance();
   
   /**
    * The class constructor - Sets up the panel and tool bar and adds them to this JPanel.
@@ -140,15 +142,6 @@ public class BindrBook extends JPanel implements ActionListener
     p.add (lastName, BorderLayout.LINE_START);
     p.add (inputLastName);
     
-    if (isTeacher)
-    {
-      p.add (time, BorderLayout.LINE_START);
-      p.add (inputTime);
-      cal = Calendar.getInstance();
-      //to fix. doesn't work.
-      inputTime.setText ((String)dateFormat.format(cal.getTime()));
-    }
-    
     p.add (signInButton, BorderLayout.LINE_START);
     p.add (signOutButton);
     
@@ -165,6 +158,9 @@ public class BindrBook extends JPanel implements ActionListener
       p.add (absentButton);
       signInOutGroup.add (absentButton);
       absentButton.addActionListener (this);
+      
+      p.add (time, BorderLayout.LINE_START);
+      p.add (inputTime);
     }
     
     p.add (reason, BorderLayout.LINE_START);
@@ -191,23 +187,33 @@ public class BindrBook extends JPanel implements ActionListener
       addButtons (toolBar);
       add (toolBar, BorderLayout.PAGE_END);
     }
+    p.revalidate();
     add (p, BorderLayout.CENTER);
     
     currentLayout = true;
     displayBook(isTeacher);
   }
   
+  
   private void submitRecord(boolean isTeacher)
   {
-    cal = Calendar.getInstance();
+    String timeText;
+    if (isTeacher)
+      timeText = inputTime.getText();
+    else
+    {
+      cal = Calendar.getInstance();
+      timeText = dateFormat.format(cal.getTime());
+    }
     
-    s = new StudentRecord (inputFirstName.getText(), inputLastName.getText() , getSelectedButtonText(signInOutGroup), dateFormat.format(cal.getTime()),inputReason.getText());
+    s = new StudentRecord (inputFirstName.getText(), inputLastName.getText() , getSelectedButtonText(signInOutGroup), timeText,inputReason.getText());
     
     if (!isTeacher || (isTeacher && currentRecord==-1))
       students.add(s);
     else
       students.set(currentRecord,s);
   }
+  
   
   public String getSelectedButtonText(ButtonGroup signInOutGroup) 
   {
@@ -222,6 +228,7 @@ public class BindrBook extends JPanel implements ActionListener
     }
     return null;
   }
+  
   
   protected void addButtons (JToolBar toolBar)
   {
@@ -256,11 +263,12 @@ public class BindrBook extends JPanel implements ActionListener
     return button;
   }
   
+  
   public void makeTable ()
   {
     setLayout (new BorderLayout ());
     
-    String[] columnNames = {"First Name" , "Last Name" , "Time" , "In/Out/Absent" , "Reason"};
+    String[] columnNames = {"First Name" , "Last Name" , "In/Out/Absent" , "Time" , "Reason"};
 //    String[][] tempValues = {{"Angela", "Jeong", "2:30", "Sign In", "Because"},
 //      {"Lucas", "Lee", "3:00", "Sign Out", "Why not"},
 //      {"Janelle", "Sookhai", "2:00", "Sign In", "Early"},
@@ -288,12 +296,12 @@ public class BindrBook extends JPanel implements ActionListener
       {
         TableModel model = (TableModel)e.getSource();
         int rNum = table.getSelectedRow();
-        String first = (String)model.getValueAt(rNum,1);
-        String last = (String)model.getValueAt(rNum,2);
-        String attendance = (String)model.getValueAt(rNum,3);
-        String time = (String)model.getValueAt(rNum,4);
+        String first = (String)model.getValueAt(rNum,0);
+        String last = (String)model.getValueAt(rNum,1);
+        String attendance = (String)model.getValueAt(rNum,2);
+        String time = (String)model.getValueAt(rNum,3);
         
-        StudentRecord s = new StudentRecord(first,last,attendance,time,(String)model.getValueAt(rNum,5));
+        StudentRecord s = new StudentRecord(first,last,attendance,time,(String)model.getValueAt(rNum,4));
         students.set(rNum,s);
         
         if(!first.isEmpty())
@@ -332,58 +340,51 @@ public class BindrBook extends JPanel implements ActionListener
     students.clear();
     for (int i=0; i<dataValues.length; i++)
     {
-      s = new StudentRecord (dataValues[i][1],dataValues[i][2],dataValues[i][3],dataValues[i][4],dataValues[i][5]);
+      s = new StudentRecord (dataValues[i][0],dataValues[i][1],dataValues[i][2],dataValues[i][3],dataValues[i][4]);
       students.add(s);
       
+      // if (!dataValues[i][0].isEmpty())
+      s.setFirst(dataValues[i][0]);
       if (!dataValues[i][1].isEmpty())
-        s.setFirst(dataValues[i][1]);
+        s.setLast(dataValues[i][1]);
       if (!dataValues[i][2].isEmpty())
-        s.setLast(dataValues[i][2]);
+        s.setAttendance(dataValues[i][2]);
       if (!dataValues[i][3].isEmpty())
         s.setTime(dataValues[i][3]);
     }
   }
   
-//  public void sort(int field)
-//  {
-//    int[] array = new int[students.size()];
-//    
-//    array = SortSearch.sort(field, dataValues);
-//    
-//    dataValues = new String [array.length][5];
-//    for (int y=0; y<array.length; y++)
-//    {
-//      dataValues [y][0] = Integer.toString(array[y]+1);
-//      dataValues [y][1] = students.get(array[y]).getFirst();
-//      dataValues [y][2] = students.get(array[y]).getLast();
-//      dataValues [y][3] = students.get(array[y]).getTime();
-//      dataValues [y][4] = students.get(array[y]).getReason();
-//    }
-//  }
-//  
-//  public void search(int type, int field, boolean isWhole, String match)
-//  {
-//    ArrayList<Integer> array = new ArrayList<>();
-//    
-//    System.out.println("in field is " + field);
-//    System.out.println("in match is " + match);
-//    
-//    if (type==1)
-//      array = SortSearch.sequentialSearch(field, isWhole, match, dataValues);
-//    else
-//      array = SortSearch.binarySearch(field, isWhole, match, dataValues);
-//    System.out.println("in search array is " + array.size());
-//    
-//    dataValues = new String [array.size()][5];
-//    for (int y=0; y<array.size(); y++)
-//    {
-//      dataValues [y][0] = Integer.toString(array.get(y)+1);
-//      dataValues [y][1] = students.get(array.get(y)).getFirst();
-//      dataValues [y][2] = students.get(array.get(y)).getLast();
-//      dataValues [y][3] = students.get(array.get(y)).getTime();
-//      dataValues [y][4] = students.get(array.get(y)).getReason();
-//    }
-//  }
+  public void sort(int field)
+  {
+    int[] array = new int[students.size()];
+    array = SortSearch.sort(field, dataValues);
+    
+    dataValues = new String [array.length][5];
+    for (int y=0; y<array.length; y++)
+    {
+      dataValues [y][0] = students.get(array[y]).getFirst();
+      dataValues [y][1] = students.get(array[y]).getLast();
+      dataValues [y][2] = students.get(array[y]).getAttendance();
+      dataValues [y][3] = students.get(array[y]).getTime();
+      dataValues [y][4] = students.get(array[y]).getReason();
+    }
+  }
+  
+  public void search(int field, boolean isWhole, String match)
+  {
+    ArrayList<Integer> array = new ArrayList<>();
+    array = SortSearch.search(field, isWhole, match, dataValues);
+    
+    dataValues = new String [array.size()][5];
+    for (int y=0; y<array.size(); y++)
+    {
+      dataValues [y][0] = students.get(array.get(y)).getFirst();
+      dataValues [y][1] = students.get(array.get(y)).getLast();
+      dataValues [y][2] = students.get(array.get(y)).getAttendance();
+      dataValues [y][3] = students.get(array.get(y)).getTime();
+      dataValues [y][4] = students.get(array.get(y)).getReason();
+    }
+  }
   
   private JFileChooser makeFileChooser(String fileName)
   {
@@ -603,9 +604,13 @@ public class BindrBook extends JPanel implements ActionListener
     {
       inputFirstName.setText("");
       inputLastName.setText("");
-      if (isTeacher)
-        inputTime.setText("");
       inputReason.setText("");
+      if (isTeacher)
+      {
+        cal = Calendar.getInstance();
+        dateFormat = new SimpleDateFormat("hh:mm a");
+        inputTime.setText(dateFormat.format(cal.getTime()).toString());
+      }
     }
     
     else

@@ -163,10 +163,4 @@ public class UserSettings extends JPanel
       JOptionPane.showMessageDialog (b, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
     }
   }
-  
-  //delete class, add class (files)
-  //to be done separate: delete students, add students (lines in file: First /n Last)
-  public void manageClasses(String currentUsername)
-  {
-  }
 }

@@ -107,7 +107,7 @@ public class StudentRecord
   
   private String formatTime (String time)
   {
-    time = time.replaceAll(" ","")+time.replaceAll(".","")+time.toUpperCase();
+    time = time.replaceAll(" ","")+time.replaceAll(".","")+time.replaceAll(":","")+time.toUpperCase();
     if (time.length()==4)
     {
       if (Integer.parseInt(time.substring(0,2))>12)

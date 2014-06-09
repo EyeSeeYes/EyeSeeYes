@@ -1,0 +1,172 @@
+//The "User Settings" class.
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+
+public class UserSettings extends JPanel
+{
+  BindrDatabase b;
+  
+  public UserSettings(BindrDatabase bd)
+  {
+    b = bd;
+    setLayout (new FlowLayout ());
+  }
+  
+  public void change(final String currentUsername, final String currentPassword)
+  {
+    JLabel newUsernameLabel = new JLabel ("New username: ");
+    JLabel currentPasswordLabel = new JLabel ("Current password: ");
+    JLabel newPasswordLabel = new JLabel ("New password: ");
+    JLabel confirmNewPasswordLabel = new JLabel ("Confirm new password: ");
+    
+    final JTextField  inputNewUsername = new JTextField(10);
+    final JPasswordField inputCurrentPassword = new JPasswordField(10);
+    final JPasswordField  inputNewPassword = new JPasswordField(10);
+    final JPasswordField  inputConfirmNewPassword = new JPasswordField(10);
+    
+    JButton cancelUserSettingsButton = new JButton("Cancel");
+    JButton submitUserSettingsButton = new JButton("Submit");
+    
+    cancelUserSettingsButton.addActionListener (new ActionListener ()
+                                                  {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.exitSettings ();
+      }});
+    
+    submitUserSettingsButton.addActionListener (new ActionListener ()
+                                                  {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (!inputCurrentPassword.getText().equals(currentPassword))
+          JOptionPane.showMessageDialog (b, "Incorrect Password", "ERROR", JOptionPane.ERROR_MESSAGE);
+        else if(!inputNewPassword.getText().isEmpty() && !inputConfirmNewPassword.getText().isEmpty())
+        {
+          if (inputNewPassword.getText().length()<6 || inputNewPassword.getText().length()>12)
+            JOptionPane.showMessageDialog (b, "Password must be between 6 and 12 characters in length.", "ERROR", JOptionPane.ERROR_MESSAGE);
+          else if (!inputNewPassword.equals(inputConfirmNewPassword))
+            JOptionPane.showMessageDialog (b, "Passwords do not match.", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        else
+          printLogin(0, currentUsername, inputNewUsername.getText(), currentPassword, inputNewPassword.getText());
+        b.exitSettings ();
+      }
+    });
+    
+    add(newUsernameLabel);
+    add(inputNewUsername);
+    add(currentPasswordLabel);
+    add(inputCurrentPassword);
+    add (newPasswordLabel);
+    add (inputNewPassword);
+    add (confirmNewPasswordLabel);
+    add (inputConfirmNewPassword);
+    add (cancelUserSettingsButton);
+    add (submitUserSettingsButton);
+    validate();
+  }
+  
+  public void delete(final String currentUsername, final String currentPassword)
+  {
+    JLabel confirmPasswordLabel = new JLabel ("Please enter your password: ");
+    final JPasswordField  confirmPassword = new JPasswordField(12);
+    
+    JButton cancelDeleteAccountButton = new JButton("Cancel");
+    cancelDeleteAccountButton.addActionListener (new ActionListener ()
+                                                   {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.exitSettings ();
+      }});
+    
+    JButton deleteAccountButton = new JButton("Delete Account");
+    deleteAccountButton.addActionListener (new ActionListener ()
+                                             {
+      public void actionPerformed (ActionEvent e)
+      {
+        if (!confirmPassword.getText().equals(currentPassword))
+          JOptionPane.showMessageDialog (b, "Incorrect Password", "ERROR", JOptionPane.ERROR_MESSAGE);
+        else
+        {
+          int confirm = JOptionPane.showConfirmDialog (b, "If you delete your account, your account file will be deleted. Do you still wish to delete your account?", "Delete Account", JOptionPane.OK_CANCEL_OPTION);
+          
+          if (confirm==JOptionPane.OK_OPTION)
+          {
+            printLogin(1,currentUsername,null,currentPassword,null);
+            System.exit(0);
+          }
+        }
+      }});
+    
+    add(confirmPasswordLabel);
+    add(confirmPassword);
+    add(cancelDeleteAccountButton);
+    add(deleteAccountButton);
+    validate();
+  }
+  
+  public void printLogin(int method, String currentUsername, String newUsername, String currentPassword, String newPassword)
+  {
+    try
+    {
+      File inputFile = new File (".//TeacherLogin/teacher info.login");
+      File tempFile = new File ("tempFile.login");
+      
+      BufferedReader br = new BufferedReader(new FileReader(inputFile));
+      PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
+      
+      if (!br.readLine().equals ("EYESEEYES BINDR FILE"))
+        JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        pw.println("EYESEEYES BINDR FILE");
+        
+        int total = Integer.parseInt(br.readLine());
+        if (method==1)
+          total++;
+        else
+        {
+          if (method==2)
+            total--;
+        }
+        pw.println(total);
+        
+        for (int i=0; i<total; i++)
+        {
+          String currentLine = br.readLine();
+          if (method==0 && currentLine.equals(currentUsername))
+          {
+            if (!newUsername.isEmpty())
+              pw.println(newUsername);
+            else
+              pw.println(currentUsername);
+            if (!newPassword.isEmpty())
+              pw.println(newPassword);
+            else
+              pw.println(currentPassword);
+          }
+          else
+          {
+            pw.println(currentLine);
+            pw.println(br.readLine());
+          }
+        }
+        tempFile.renameTo(inputFile);
+        br.close();
+        pw.close();
+      }
+    }
+    catch (IOException ioe)
+    {
+      JOptionPane.showMessageDialog (b, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+  }
+  
+  //delete class, add class (files)
+  //to be done separate: delete students, add students (lines in file: First /n Last)
+  public void manageClasses(String currentUsername)
+  {
+  }
+}

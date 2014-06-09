@@ -122,6 +122,7 @@ public class BindrBook extends JPanel implements ActionListener
     JLabel time = new JLabel ("Time:");
     JLabel reason = new JLabel ("Reason:");
     JRadioButton signInButton = new JRadioButton ("Sign in");
+    signInButton.setSelected(true);
     JRadioButton signOutButton = new JRadioButton ("Sign out");
     
     //text fields
@@ -495,6 +496,7 @@ public class BindrBook extends JPanel implements ActionListener
         {
           pw.println(students.get(i).getFirst());
           pw.println(students.get(i).getLast());
+          pw.println(students.get(i).getAttendance());
           pw.println(students.get(i).getTime());
           pw.println(students.get(i).getReason());
         }

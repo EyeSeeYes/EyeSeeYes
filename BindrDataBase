@@ -18,13 +18,18 @@ public class BindrDatabase extends JFrame implements ActionListener
    * An instance of the BindrBook class to be added to this class.
    */
   BindrBook b;
-  ButtonGroup group, fieldGroup, settingsGroup;
-  boolean isWhole, isSorted, isSelected;
+  UserSettings u;
+  
+  BufferedImage img;
   CardLayout cards = new CardLayout ();
   JPanel cardLayoutPanel = new JPanel (cards);
-  BufferedImage img;
+  
   JTextField usernameField = new JTextField (); 
-  JPasswordField passwordField = new JPasswordField (); 
+  JPasswordField passwordField = new JPasswordField ();
+  String currentUsername, currentPassword;
+  
+  ButtonGroup group, fieldGroup, settingsGroup;
+  boolean isWhole;
   
   /**
    * The class constructor - Creates a new instance of BindrBook and adds it to a window.
@@ -149,14 +154,19 @@ public class BindrDatabase extends JFrame implements ActionListener
     
     signIn.setBounds (250, 250, 200, 50);
     signIn.addActionListener (new ActionListener () 
-                                { 
+                                {
       public void actionPerformed (ActionEvent e) 
-      { 
-        if (canSignIn(usernameField.getText(),passwordField.getText())) 
-        { 
-          remove(cardLayoutPanel); 
-          makeDatabaseApp (); 
-          validate(); 
+     {
+//        if (usernameField.getText().isEmpty() || passwordField.getText().isEmpty())
+//          JOptionPane.showMessageDialog (this, "You must enter both your username and password.", "Error", JOptionPane.ERROR_MESSAGE);
+//        else
+        {
+          if (canSignIn(usernameField.getText(),passwordField.getText())) 
+          { 
+            remove(cardLayoutPanel); 
+            makeDatabaseApp (); 
+            validate(); 
+          }
         }
       }});
     
@@ -180,47 +190,38 @@ public class BindrDatabase extends JFrame implements ActionListener
   
   protected boolean canSignIn (String userName, String passWord)
   {
-    String nameChecker = "";
-    String passChecker = "";
-    String headerChecker = "";
     try
     {
-      BufferedReader input = new BufferedReader (new FileReader (".//TeacherLogin/teacher info.login"));
-      headerChecker = input.readLine ();
-    }
-    catch (Exception e)
-    {
-      JOptionPane.showMessageDialog (this, "File not found", "Error", JOptionPane.ERROR_MESSAGE);
-      return false;
-    }
-    if (!headerChecker.equals ("EYESEEYES BINDR FILE"))
-    {
-      JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
-      headerChecker = "";
-      return false;
-    }
-    else 
-    {
-      try
-      {
-        BufferedReader input = new BufferedReader (new FileReader (".//TeacherLogin/teacher info.login"));
-        input.readLine ();
-        nameChecker = input.readLine ();
-        passChecker = input.readLine ();
-      }
-      catch (Exception e)
-      {
+      File loginFile = new File(".//TeacherLogin/teacherInfo.login");
+      System.out.println(loginFile.getName());
+      BufferedReader input = new BufferedReader (new FileReader (loginFile));
+      if (!input.readLine().equals ("EYESEEYES BINDR FILE"))
         JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
-        return false;
+      else
+      {
+        for (int i=0; i<Integer.parseInt(input.readLine()); i++)
+        {
+          String u = input.readLine();
+          String p = input.readLine();
+          System.out.println(u+", "+p);
+          if (u.equals(userName) && p.equals(passWord))
+          {
+            currentUsername = userName;
+            currentPassword = passWord;
+            input.close();
+            return true;
+          }
+          else 
+          {
+            JOptionPane.showMessageDialog (this, "Incorrect username or password", "?", JOptionPane.ERROR_MESSAGE);
+          }
+        }
       }
     }
-    if (userName.equals (nameChecker) && passWord.equals (passChecker))
+    catch (IOException ioe)
     {
-      return true; 
-    }
-    else 
-    {
-      JOptionPane.showMessageDialog (this, "Incorrect username or password", "?", JOptionPane.ERROR_MESSAGE);
+      System.out.println(ioe);
+      JOptionPane.showMessageDialog (this, "File not found", "Error", JOptionPane.ERROR_MESSAGE);
     }
     return false; 
   }
@@ -242,60 +243,32 @@ public class BindrDatabase extends JFrame implements ActionListener
    * to confirm the user's new password.<br>
    * 
    */ 
-  public void userSettings ()
+  public void accountSettings ()
   {
+    u = new UserSettings(this);
     remove(b);
     validate();
-    final JPanel userSettingsPanel = new JPanel (null);
     
+    u.change(currentUsername, currentPassword);
+    add(u);
+    validate();
+  }
+  
+  public void deleteAccount()
+  {
+    u = new UserSettings(this);
+    remove(b);
+    validate();
     
-    JLabel newUsernameLabel = new JLabel ("New username: ");
-    JLabel currentPasswordLabel = new JLabel ("Current password: ");
-    JLabel newPasswordLabel = new JLabel ("New password: ");
-    JLabel confirmNewPasswordLabel = new JLabel ("Confirm new password: ");
-    
-    JTextField  inputNewUsername = new JTextField(10);
-    JPasswordField inputCurrentPassword = new JPasswordField(10);
-    JPasswordField  inputNewPassword = new JPasswordField(10);
-    JPasswordField  inputConfirmNewPassword = new JPasswordField(10);
-    
-    JButton cancelUserSettingsButton = new JButton("Cancel");
-    JButton submitUserSettingsButton = new JButton("Submit");
-    
-    cancelUserSettingsButton.addActionListener (new ActionListener ()
-                                                  {
-      public void actionPerformed (ActionEvent e)
-      {
-        remove(userSettingsPanel);
-        makeDatabaseApp ();
-        validate();
-      }});
-    
-    submitUserSettingsButton.addActionListener (new ActionListener ()
-                                                  {
-      public void actionPerformed (ActionEvent e)
-      {
-        //to fix
-        remove(userSettingsPanel);
-        makeDatabaseApp ();
-        validate();
-      }});
-    
-    userSettingsPanel.setLayout (new FlowLayout ());
-    userSettingsPanel.add(newUsernameLabel);
-    userSettingsPanel.add(inputNewUsername);
-    userSettingsPanel.add(currentPasswordLabel);
-    userSettingsPanel.add(inputCurrentPassword);
-    userSettingsPanel.add (newPasswordLabel);
-    userSettingsPanel.add (inputNewPassword);
-    userSettingsPanel.add (confirmNewPasswordLabel);
-    userSettingsPanel.add (inputConfirmNewPassword);
-    userSettingsPanel.add (cancelUserSettingsButton);
-    userSettingsPanel.add (submitUserSettingsButton);
-    
-    add(userSettingsPanel);
-    
-    userSettingsPanel.validate();
+    u.delete(currentUsername, currentPassword);
+    add(u);
+    validate();
+  }
+  
+  public  void exitSettings()
+  {
+    remove(u);
+    makeDatabaseApp ();
     validate();
   }
   
@@ -319,7 +292,8 @@ public class BindrDatabase extends JFrame implements ActionListener
     JMenuItem tableItem = new JMenuItem ("Table");
     JMenuItem sortItem = new JMenuItem ("Sort");
     JMenuItem searchItem = new JMenuItem ("Search");
-    JMenuItem userSettingsItem = new JMenuItem ("User Settings");
+    JMenuItem accountSettingsItem = new JMenuItem ("Account Settings");
+    JMenuItem deleteAccountItem = new JMenuItem ("Delete Account");
     
     JMenu fileMenu = new JMenu ("File");
     JMenu displayMenu = new JMenu ("Display");
@@ -336,7 +310,8 @@ public class BindrDatabase extends JFrame implements ActionListener
     displayMenu.add (tableItem);
     sortSearchMenu.add (sortItem);
     sortSearchMenu.add(searchItem);
-    settingsMenu.add (userSettingsItem);
+    settingsMenu.add (accountSettingsItem);
+    settingsMenu.add(deleteAccountItem);
     myMenus.add (fileMenu);
     myMenus.add (displayMenu);
     myMenus.add(sortSearchMenu);;
@@ -352,7 +327,8 @@ public class BindrDatabase extends JFrame implements ActionListener
     tableItem.addActionListener (this);
     sortItem.addActionListener(this);
     searchItem.addActionListener(this);
-    userSettingsItem.addActionListener (this);
+    accountSettingsItem.addActionListener (this);
+    deleteAccountItem.addActionListener(this);
     
     SwingUtilities.updateComponentTreeUI(this);
   }
@@ -360,9 +336,8 @@ public class BindrDatabase extends JFrame implements ActionListener
   private void makeSortDialog (final String type)
   {
     JDialog d = new JDialog (this, "Sort");
-    isSelected = false;
     
-    d.setSize (250,100);
+    d.setSize (250,125);
     d.setResizable (false);
     d.setLayout (new FlowLayout());
     
@@ -373,8 +348,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                      {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.sort(0);
+        b.createData();
+        b.sort(0);
         displayLayout(false,false);
       }
     });
@@ -384,8 +359,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                     {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.sort(1);
+        b.createData();
+        b.sort(1);
         displayLayout(false,false);
       }
     });
@@ -395,8 +370,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                           {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.sort(2);
+        b.createData();
+        b.sort(2);
         displayLayout(false,false);
       }
     });
@@ -406,33 +381,47 @@ public class BindrDatabase extends JFrame implements ActionListener
                                     {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.sort(3);
+        b.createData();
+        b.sort(3);
         displayLayout(false,false);
       }
     });
     
     JRadioButton reasonButton = new JRadioButton ("Reason");
-    timeButton.addActionListener (new ActionListener()
+    reasonButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.sort(4);
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton undoButton = new JRadioButton ("Undo");
+    undoButton.addActionListener (new ActionListener()
                                     {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.sort(4);
+        b.createData();
         displayLayout(false,false);
       }
     });
     
     group.add(firstButton);
     group.add(lastButton);
-    group.add(timeButton);
     group.add(attendanceButton);
+    group.add(timeButton);
+    group.add(reasonButton);
+    group.add(undoButton);
     
     d.add(label);
     d.add(firstButton);
     d.add(lastButton);
-    d.add(timeButton);
     d.add(attendanceButton);
+    d.add(timeButton);
+    d.add(reasonButton);
+    d.add(undoButton);
     d.setLocationRelativeTo (this);
     d.setVisible (true);
   }
@@ -441,7 +430,6 @@ public class BindrDatabase extends JFrame implements ActionListener
   private void makeSearchDialog()
   {
     JDialog d = new JDialog (this, "Search");
-    isSelected = false;
     isWhole = true;
     
     d.setSize (300,200);
@@ -478,8 +466,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                      {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.search(0,isWhole,text.getText());
+        b.createData();
+        b.search(0,isWhole,text.getText());
         displayLayout(false,false);
       }
     });
@@ -489,8 +477,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                     {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.search(1,isWhole,text.getText());
+        b.createData();
+        b.search(1,isWhole,text.getText());
         displayLayout(false,false);
       }
     });
@@ -500,8 +488,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                           {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.search(2,isWhole,text.getText());
+        b.createData();
+        b.search(2,isWhole,text.getText());
         displayLayout(false,false);
       }
     });
@@ -511,8 +499,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                     {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.search(3,isWhole,text.getText());
+        b.createData();
+        b.search(3,isWhole,text.getText());
         displayLayout(false,false);
       }
     });
@@ -522,8 +510,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                       {
       public void actionPerformed (ActionEvent e)
       {
-          b.createData();
-          b.search(4,isWhole,text.getText());
+        b.createData();
+        b.search(4,isWhole,text.getText());
         displayLayout(false,false);
       }
     });
@@ -672,10 +660,14 @@ public class BindrDatabase extends JFrame implements ActionListener
       makeSearchDialog();
     }
     
-    else if (e.getActionCommand ().equals ("User Settings"))
+    else if (e.getActionCommand ().equals ("Account Settings"))
     {
-      b.removeAll();
-      userSettings();
+      accountSettings();
+    }
+    
+    else if (e.getActionCommand().equals("Delete Account"))
+    {
+      deleteAccount();
     }
   }
   

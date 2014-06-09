@@ -63,6 +63,9 @@ public class BindrBook extends JPanel implements ActionListener
   static JTextField inputLastName;
   
   static ButtonGroup signInOutGroup;
+  JRadioButton signInButton;
+  JRadioButton signOutButton;
+  JRadioButton absentButton;
   
   static JTextField inputTime;
   /**
@@ -121,9 +124,8 @@ public class BindrBook extends JPanel implements ActionListener
     JLabel lastName = new JLabel ("Last Name:");
     JLabel time = new JLabel ("Time:");
     JLabel reason = new JLabel ("Reason:");
-    JRadioButton signInButton = new JRadioButton ("Sign in");
-    signInButton.setSelected(true);
-    JRadioButton signOutButton = new JRadioButton ("Sign out");
+    signInButton = new JRadioButton ("Sign In");
+    signOutButton = new JRadioButton ("Sign Out");
     
     //text fields
     inputFirstName = new JTextField (15);
@@ -155,7 +157,7 @@ public class BindrBook extends JPanel implements ActionListener
     
     if (isTeacher)
     {
-      JRadioButton absentButton = new JRadioButton ("Absent");
+      absentButton = new JRadioButton ("Absent");
       p.add (absentButton);
       signInOutGroup.add (absentButton);
       absentButton.addActionListener (this);
@@ -329,8 +331,8 @@ public class BindrBook extends JPanel implements ActionListener
     {
       dataValues [y][0] = students.get(y).getFirst();
       dataValues [y][1] = students.get(y).getLast();
-      dataValues [y][2] = students.get(y).getTime();
-      dataValues [y][3] = students.get(y).getAttendance();
+      dataValues [y][2] = students.get(y).getAttendance();
+      dataValues [y][3] = students.get(y).getTime();
       dataValues [y][4] = students.get(y).getReason();
     }
   }
@@ -606,6 +608,7 @@ public class BindrBook extends JPanel implements ActionListener
     {
       inputFirstName.setText("");
       inputLastName.setText("");
+      signInButton.setSelected(true);
       inputReason.setText("");
       if (isTeacher)
       {
@@ -619,6 +622,15 @@ public class BindrBook extends JPanel implements ActionListener
     {
       inputFirstName.setText(students.get(currentRecord).getFirst());
       inputLastName.setText(students.get(currentRecord).getLast());
+      String attendance = students.get(currentRecord).getAttendance();
+      if (attendance.equals("Sign In"))
+        signInButton.setSelected(true);
+      else if (attendance.equals("Sign Out"))
+        signOutButton.setSelected(true);
+      else if (attendance.equals("Absent"))
+        absentButton.setSelected(true);
+      else
+        signInOutGroup.clearSelection();
       if (isTeacher)
         inputTime.setText(students.get(currentRecord).getTime());
       inputReason.setText(students.get(currentRecord).getReason());

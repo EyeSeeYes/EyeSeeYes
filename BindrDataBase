@@ -373,17 +373,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                      {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSorted)
-        {
-          isSorted = false;
           b.createData();
-          group.clearSelection();
-        }
-        else
-        {
-            b.sort(0);
-            isSorted = true;
-        }
+          b.sort(0);
         displayLayout(false,false);
       }
     });
@@ -393,37 +384,19 @@ public class BindrDatabase extends JFrame implements ActionListener
                                     {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSorted)
-        {
-          isSorted = false;
           b.createData();
-          group.clearSelection();
-        }
-        else
-        {
-            b.sort(1);
-          isSorted = true;
-        }
+          b.sort(1);
         displayLayout(false,false);
       }
     });
     
     JRadioButton attendanceButton = new JRadioButton ("Attendance");
     attendanceButton.addActionListener (new ActionListener()
-                                      {
+                                          {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSorted)
-        {
-          isSorted = false;
           b.createData();
-          group.clearSelection();
-        }
-        else
-        {
-            b.sort(2);
-          isSorted = true;
-        }
+          b.sort(2);
         displayLayout(false,false);
       }
     });
@@ -433,17 +406,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                     {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSorted)
-        {
-          isSorted = false;
           b.createData();
-          group.clearSelection();
-        }
-        else
-        {
-            b.sort(3);
-          isSorted = true;
-        }
+          b.sort(3);
         displayLayout(false,false);
       }
     });
@@ -453,17 +417,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                     {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSorted)
-        {
-          isSorted = false;
           b.createData();
-          group.clearSelection();
-        }
-        else
-        {
-            b.sort(4);
-          isSorted = true;
-        }
+          b.sort(4);
         displayLayout(false,false);
       }
     });
@@ -523,19 +478,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                      {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSelected)
-        {
-          isSelected = false;
-          isSorted = false;
           b.createData();
-          fieldGroup.clearSelection();
-        }
-        else
-        {
-            b.search(0,isWhole,text.getText());
-            System.out.println(text.getText());
-          isSelected = true;
-        }
+          b.search(0,isWhole,text.getText());
         displayLayout(false,false);
       }
     });
@@ -545,39 +489,19 @@ public class BindrDatabase extends JFrame implements ActionListener
                                     {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSelected)
-        {
-          isSelected = false;
-          isSorted = false;
           b.createData();
-          fieldGroup.clearSelection();
-        }
-        else
-        {
-            b.search(1,isWhole,text.getText());
-          isSelected = true;
-        }
+          b.search(1,isWhole,text.getText());
         displayLayout(false,false);
       }
     });
     
     JRadioButton attendanceButton = new JRadioButton ("Attendance");
     attendanceButton.addActionListener (new ActionListener()
-                                      {
+                                          {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSelected)
-        {
-          isSelected = false;
-          isSorted = false;
           b.createData();
-          fieldGroup.clearSelection();
-        }
-        else
-        {
-            b.search(2,isWhole,text.getText());
-          isSelected = true;
-        }
+          b.search(2,isWhole,text.getText());
         displayLayout(false,false);
       }
     });
@@ -587,18 +511,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                     {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSelected)
-        {
-          isSelected = false;
-          isSorted = false;
           b.createData();
-          fieldGroup.clearSelection();
-        }
-        else
-        {
-            b.search(3,isWhole,text.getText());
-          isSelected = true;
-        }
+          b.search(3,isWhole,text.getText());
         displayLayout(false,false);
       }
     });
@@ -608,18 +522,8 @@ public class BindrDatabase extends JFrame implements ActionListener
                                       {
       public void actionPerformed (ActionEvent e)
       {
-        if (isSelected)
-        {
-          isSelected = false;
-          isSorted = false;
           b.createData();
-          fieldGroup.clearSelection();
-        }
-        else
-        {
-            b.search(4,isWhole,text.getText());
-          isSelected = true;
-        }
+          b.search(4,isWhole,text.getText());
         displayLayout(false,false);
       }
     });

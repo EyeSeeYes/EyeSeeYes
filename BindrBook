@@ -21,7 +21,7 @@ import java.util.Calendar;
  * Creates a JPanel with buttons and text fields inside. <p>
  * The user can interact with the buttons and text fields to create, edit, delete, and move between records.
  * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
- * @version 4.2, June 5, 2014
+ * @version 4.3, June 8, 2014
  */
 public class BindrBook extends JPanel implements ActionListener
 {
@@ -95,8 +95,6 @@ public class BindrBook extends JPanel implements ActionListener
   
   Calendar cal;
   DateFormat dateFormat;
-  //= new SimpleDateFormat("hh:mm a");
-  //= Calendar.getInstance();
   
   /**
    * The class constructor - Sets up the panel and tool bar and adds them to this JPanel.
@@ -177,7 +175,7 @@ public class BindrBook extends JPanel implements ActionListener
                                        {
         public void actionPerformed (ActionEvent e)
         {
-          submitRecord(false);
+//          submitRecord(false);
         }});
     }
     
@@ -198,24 +196,71 @@ public class BindrBook extends JPanel implements ActionListener
   }
   
   
-  private void submitRecord(boolean isTeacher)
+  private void submitTeacherRecord()
   {
-    String timeText;
-    if (isTeacher)
-      timeText = inputTime.getText();
-    else
-    {
-      cal = Calendar.getInstance();
-      timeText = dateFormat.format(cal.getTime());
-    }
+    String first = inputFirstName.getText();
+    String last = inputLastName.getText();
+    String attendance = getSelectedButtonText(signInOutGroup);
+    String time = inputTime.getText();
     
-    s = new StudentRecord (inputFirstName.getText(), inputLastName.getText() , getSelectedButtonText(signInOutGroup), timeText,inputReason.getText());
+    s = new StudentRecord (first, last, attendance, time, inputReason.getText());
     
-    if (!isTeacher || (isTeacher && currentRecord==-1))
+    if (currentRecord==-1)
       students.add(s);
     else
       students.set(currentRecord,s);
+    
+    if (!first.isEmpty())
+      s.setFirst(first);
+    if (!last.isEmpty())
+      s.setLast(last);
+    if (!attendance.isEmpty())
+      s.setAttendance(attendance);
+    if (!time.isEmpty())
+      s.setTime(time);
   }
+//  
+//  private submitStudentRecord(String teacher, String first, String last, String attendance, String reason)
+//  {
+//    try
+//  {
+//    File teacherFile = new File(".//Users/"+teacher+".user");
+//      File tempFile = new File ("tempFile.user");
+//      cal = Calendar.getInstance();
+//dateFormat.format(cal.getTime()).toString());
+//      
+//     BufferedReader br = new BufferedReader(new FileReader(teacherFile));
+//      PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
+//      if (!br.readLine().equals ("EYESEEYES BINDR FILE"))
+//        JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
+//      else
+//      {
+//        pw.println("EYESEEYES BINDR FILE");
+//        
+//        int total = Integer.parseInt(br.readLine());
+//        total++;
+//        pw.println(total);
+//        
+//        for (int i=0; i<total; i++)
+//        {
+//            pw.println(br.readLine());
+//            pw.println(br.readLine());
+//        }
+//        pw.println(first);
+//        pw.println(last);
+//        pw.println(attendance);
+//        pw.println();
+//        pw.println(reason);
+//        
+//        tempFile.renameTo(inputFile);
+//        pw.close();
+//      }
+//    }
+//    catch (IOException ioe)
+//    {
+//      JOptionPane.showMessageDialog (b, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+//    }
+//  }
   
   
   public String getSelectedButtonText(ButtonGroup signInOutGroup) 
@@ -391,7 +436,7 @@ public class BindrBook extends JPanel implements ActionListener
   
   private JFileChooser makeFileChooser(String fileName)
   {
-    JFileChooser fc = new JFileChooser (".\\Files");
+    JFileChooser fc = new JFileChooser (".//Files");
     
     fc.setFileSelectionMode (JFileChooser.FILES_ONLY);
     fc.setFileFilter(new ExampleFileFilter("bndr", "EYESEEYES BINDR FILE"));
@@ -549,7 +594,7 @@ public class BindrBook extends JPanel implements ActionListener
     
     if (PREVIOUS.equals (cmd))
     {
-      if (students.size()!=0)
+      if (students.size()!=0 && currentRecord!=-1)
       {
         if (currentRecord == 0)
           currentRecord = students.size()-1;
@@ -576,7 +621,7 @@ public class BindrBook extends JPanel implements ActionListener
     
     else if (SUBMIT.equals (cmd))
     {
-      submitRecord(true);
+      submitTeacherRecord();
     }
     else
     {

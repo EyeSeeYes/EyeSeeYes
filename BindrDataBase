@@ -156,7 +156,7 @@ public class BindrDatabase extends JFrame implements ActionListener
     signIn.addActionListener (new ActionListener () 
                                 {
       public void actionPerformed (ActionEvent e) 
-     {
+      {
 //        if (usernameField.getText().isEmpty() || passwordField.getText().isEmpty())
 //          JOptionPane.showMessageDialog (this, "You must enter both your username and password.", "Error", JOptionPane.ERROR_MESSAGE);
 //        else
@@ -193,29 +193,28 @@ public class BindrDatabase extends JFrame implements ActionListener
     try
     {
       File loginFile = new File(".//TeacherLogin/teacherInfo.login");
-      System.out.println(loginFile.getName());
       BufferedReader input = new BufferedReader (new FileReader (loginFile));
+      
       if (!input.readLine().equals ("EYESEEYES BINDR FILE"))
         JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
       else
       {
-        for (int i=0; i<Integer.parseInt(input.readLine()); i++)
+        int total = Integer.parseInt(input.readLine());
+        String u, p;
+        
+        for (int i=0; i<total; i++)
         {
-          String u = input.readLine();
-          String p = input.readLine();
-          System.out.println(u+", "+p);
+          u = input.readLine();
+          p = input.readLine();
           if (u.equals(userName) && p.equals(passWord))
           {
-            currentUsername = userName;
-            currentPassword = passWord;
+            currentUsername = u;
+            currentPassword = p;
             input.close();
             return true;
           }
-          else 
-          {
-            JOptionPane.showMessageDialog (this, "Incorrect username or password", "?", JOptionPane.ERROR_MESSAGE);
-          }
         }
+        JOptionPane.showMessageDialog (this, "Incorrect username or password", "?", JOptionPane.ERROR_MESSAGE);
       }
     }
     catch (IOException ioe)

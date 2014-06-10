@@ -11,7 +11,7 @@ public class UserSettings extends JPanel
   public UserSettings(BindrDatabase bd)
   {
     b = bd;
-    setLayout (new FlowLayout ());
+    setLayout (null);
   }
   
   public void change(final String currentUsername, final String currentPassword)
@@ -64,15 +64,25 @@ public class UserSettings extends JPanel
           }
       }});
     
+    setBounds (81, 36, 200, 50);
     add(newUsernameLabel);
+    inputNewUsername.setBounds (185, 48, 200, 25);
     add(inputNewUsername);
+    currentPasswordLabel.setBounds (64, 68, 200, 50);
     add(currentPasswordLabel);
+    inputCurrentPassword.setBounds (185, 79, 200, 25);
     add(inputCurrentPassword);
+    newPasswordLabel.setBounds (82, 99, 200,  50);
     add (newPasswordLabel);
+    inputNewPassword.setBounds (185, 110, 200, 25);
     add (inputNewPassword);
+    confirmNewPasswordLabel.setBounds (34, 130, 200, 50);
     add (confirmNewPasswordLabel);
+    inputConfirmNewPassword.setBounds (185, 141, 200, 25);
     add (inputConfirmNewPassword);
+    cancelUserSettingsButton.setBounds (15, 252, 80, 27);
     add (cancelUserSettingsButton);
+    submitUserSettingsButton.setBounds (200, 180, 80, 27);
     add (submitUserSettingsButton);
     validate();
   }

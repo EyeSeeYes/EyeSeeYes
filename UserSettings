@@ -64,7 +64,7 @@ public class UserSettings extends JPanel
           }
       }});
     
-    setBounds (81, 36, 200, 50);
+    newUsernameLabel.setBounds (81, 36, 200, 50);
     add(newUsernameLabel);
     inputNewUsername.setBounds (185, 48, 200, 25);
     add(inputNewUsername);

@@ -1,0 +1,46 @@
+//The SortSearch class.
+import java.util.*;
+
+/**
+ * The class that handles all the sorts and searches. <p>
+ * Its methods are called by the AddressBook class when required. <p>
+ * @author Angela Jeong
+ * @version 2.0, May 14, 2014
+ */
+public class SortSearch
+{
+  public static int[] sort (int field, String[][] toSort)
+  {    
+    int[] array = new int[toSort.length];
+    int temp, j;
+    
+    for (int i=0; i<array.length; i++)
+      array[i] = i;
+    for (int i=1; i<array.length; i++)
+    {
+      temp = array[i];
+      try
+      {
+        for (j=i-1; j>=0 && toSort[array[j]][field].compareTo(toSort[temp][field])>0; j--)
+          array [j+1] = array[j];
+        array[j+1] = temp;
+      }
+      catch (StringIndexOutOfBoundsException e)
+      {
+      }
+    }
+    return array;
+  }
+  
+  public static ArrayList<Integer> search (int field, boolean isWhole, String match, String[][] toSearch)
+  {
+    ArrayList<Integer> array = new ArrayList<>();
+    
+    for (int i=0; i<toSearch.length; i++)
+    {
+      if (toSearch[i][field]!=null && (isWhole) ? toSearch[i][field].equals(match) : toSearch[i][field].contains(match))
+        array.add(i);
+    }
+    return array;
+  }
+}

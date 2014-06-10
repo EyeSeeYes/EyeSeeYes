@@ -20,7 +20,7 @@ public class UserSettings extends JPanel
   
   /**
    * The class constructor.
-   * The BindrDatabase class is pased in and the layout is set to null.
+   * The BindrDatabase class is passed in and the layout is set to null.
    */
   public UserSettings(BindrDatabase bd)
   {

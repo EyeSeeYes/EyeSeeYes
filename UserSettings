@@ -1,19 +1,38 @@
 //The "User Settings" class.
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 
+/**
+ * Handles everything to do with user settings, namely changing username/passwords, creating new accounts and deleting old accounts. <p>
+ * It is called by the BindrDatabase class when any of the user settings menu items or the "New Account" button in the login panel is selected. <p>
+ * @author Angela Jeong, Janelle Sookhai
+ * @version 2.0 June 10, 2014
+ */
 public class UserSettings extends JPanel
 {
+  /**
+   * The BindrDatabase class.
+   */
   BindrDatabase b;
   
+  /**
+   * The class constructor.
+   * The BindrDatabase class is pased in and the layout is set to null.
+   */
   public UserSettings(BindrDatabase bd)
   {
     b = bd;
     setLayout (null);
   }
   
+  /**
+   * The change method - creates the panel used in changing usernames and passwords.
+   * @param currentUsername String The current user's username.
+   * @param currentPassword String The current user's password.
+   */
   public void change(final String currentUsername, final String currentPassword)
   {
     JLabel newUsernameLabel = new JLabel ("New username: ");
@@ -31,6 +50,11 @@ public class UserSettings extends JPanel
     
     cancelUserSettingsButton.addActionListener (new ActionListener ()
                                                   {
+      /**
+       * actionPerformed method for the cancelUserSettingsButton.
+       * Exits the user setttings panel.
+       * @param e ActionEvent
+       */
       public void actionPerformed (ActionEvent e)
       {
         b.exitSettings ();
@@ -38,6 +62,11 @@ public class UserSettings extends JPanel
     
     submitUserSettingsButton.addActionListener (new ActionListener ()
                                                   {
+      /**
+       * actionPerformed method for the submitUserSettingsButton.
+       * Calls the printLogin method if conditions are met, to change user settings.
+       * @param e ActionEvent
+       */
       public void actionPerformed (ActionEvent e)
       {
         outerIf:
@@ -87,7 +116,11 @@ public class UserSettings extends JPanel
     validate();
   }
   
-  
+  /**
+   * The delete method - deletes the current account.
+   * @param currentUsername String The current user's username.
+   * @param currentPassword String The current user's password.
+   */
   public void delete(final String currentUsername, final String currentPassword)
   {
     JLabel confirmPasswordLabel = new JLabel ("Please enter your password: ");
@@ -96,6 +129,10 @@ public class UserSettings extends JPanel
     JButton cancelDeleteAccountButton = new JButton("Cancel");
     cancelDeleteAccountButton.addActionListener (new ActionListener ()
                                                    {
+      /**
+       * actionPerformed method for the cancelDeleteAccountButton.
+       * Exits the user settings panel.
+       */
       public void actionPerformed (ActionEvent e)
       {
         b.exitSettings ();
@@ -104,6 +141,11 @@ public class UserSettings extends JPanel
     JButton deleteAccountButton = new JButton("Delete Account");
     deleteAccountButton.addActionListener (new ActionListener ()
                                              {
+      /**
+       * actionPerformed method for the deleteAccountButton.
+       * Calls the printLogin method if conditions are met to delete the account, and deletes the account's user file.
+       * @param e ActionEvent
+       */
       public void actionPerformed (ActionEvent e)
       {
         if (!confirmPassword.getText().equals(currentPassword))
@@ -130,7 +172,15 @@ public class UserSettings extends JPanel
     validate();
   }
   
-  
+  /**
+   * The printLogin method - prints the list of accounts onto the login file.
+   * The method also does any manipulations of accounts within the file, namely changing username/passwords, and adding or deleting accounts.
+   * @param method int The integer that determines whether the method will change username/passwords, add a new account, or delete an old account.
+   * @param currentUsername String The current account's username.
+   * @param newUsername String The new username (null if method is not 0).
+   * @param currentPassword String The current account's password.
+   * @param newPassword String The new password (null if method is not 0).
+   */
   public void printLogin(int method, String currentUsername, String newUsername, String currentPassword, String newPassword)
   {
     try

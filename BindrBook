@@ -221,7 +221,7 @@ public class BindrBook extends JPanel implements ActionListener
                                        {
         public void actionPerformed (ActionEvent e)
         {
-          File teacherFile = new File(".//Users/"+teacherName.getText()+".user");
+          File teacherFile = new File(".//Users/"+teacherName.getText()+"/UserFile.user");
           if (!teacherFile.isFile())
             JOptionPane.showMessageDialog (((Component)e.getSource()).getParent(), "The teacher you entered does not exist.", "ERROR", JOptionPane.ERROR_MESSAGE);
           else
@@ -246,6 +246,10 @@ public class BindrBook extends JPanel implements ActionListener
   }
   
   
+  /**
+   * The submitTeacherRecord method - submits a record from teacher view into the file they are currently on.
+   * @param none
+   */
   private void submitTeacherRecord()
   {
     String first = inputFirstName.getText();
@@ -270,7 +274,14 @@ public class BindrBook extends JPanel implements ActionListener
       s.setTime(time);
   }
   
-  
+  /**
+   * The submitStudentRecord method - submits a record from student view into a teacher's user file.
+   * @param teacherFile File The teacher's user file.
+   * @param first String The student's first name.
+   * @param last String The student's last name.
+   * @param attendance String Whether the student was signing in or out.
+   * @param reason String The student's reason to be signing in or out.
+   */
   private void submitStudentRecord(File teacherFile, String first, String last, String attendance, String reason)
   {
     try
@@ -282,39 +293,64 @@ public class BindrBook extends JPanel implements ActionListener
       BufferedReader br = new BufferedReader(new FileReader(teacherFile));
       PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
       
-      if (!br.readLine().equals ("EYESEEYES BINDR FILE"))
-        JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
-      else
-      {
-        pw.println("EYESEEYES BINDR FILE");
-        
+      pw.println("EYESEEYES BINDR FILE");
+      br.readLine();
+      try
+      {        
         int total = Integer.parseInt(br.readLine());
-        total++;
-        pw.println(total);
+        pw.println(total+1);
         
         for (int i=0; i<total*5; i++)
-          pw.println(br.readLine());
-        
-        pw.println(first);
-        pw.println(last);
-        pw.println(attendance);
-        pw.println(dateFormat.format(cal.getTime()).toString());
-        pw.println(reason);
-        
-        teacherFile.delete();
-        boolean renamed = tempFile.renameTo(teacherFile);
-        if(renamed)
-          JOptionPane.showMessageDialog (this, "Entry has been successfully submitted.");
-        else
-          JOptionPane.showMessageDialog (this, "Error has occured while attempting to submit entry.", "ERROR", JOptionPane.ERROR_MESSAGE);
-        
-        pw.close();
+        {
+          String toPrint = br.readLine();
+          System.out.println(toPrint);
+          if(toPrint != null)
+            pw.println(toPrint);
+          else
+            pw.println("");
+        }
       }
+      catch(Exception e)
+      {
+        JOptionPane.showMessageDialog (this, "File cannot be read, rewriting... ", "Error", JOptionPane.ERROR_MESSAGE);
+        pw.println(0);
+      }
+      
+      pw.println(first);
+      pw.println(last);
+      pw.println(attendance);
+      pw.println(dateFormat.format(cal.getTime()).toString());
+      pw.println(reason);
+      
+      pw.close();
+      br.close();
+      
+      teacherFile.delete();
+      boolean renamed = tempFile.renameTo(teacherFile);
+      
+      if(renamed)
+        JOptionPane.showMessageDialog (this, "Entry has been successfully submitted.");
+      else
+        JOptionPane.showMessageDialog (this, "Error has occured while attempting to submit entry.", "ERROR", JOptionPane.ERROR_MESSAGE);
     }
     catch (IOException ioe)
     {
       JOptionPane.showMessageDialog (this, "Unknown error has occured.", "ERROR", JOptionPane.ERROR_MESSAGE);
     }
+  }
+  
+  public String getSelectedButtonText(ButtonGroup signInOutGroup) 
+  {
+    for (Enumeration<AbstractButton> buttons = signInOutGroup.getElements(); buttons.hasMoreElements();) 
+    {
+      AbstractButton button = buttons.nextElement();
+      
+      if (button.isSelected()) 
+      {
+        return button.getText();
+      }
+    }
+    return null;
   }
   
   /**

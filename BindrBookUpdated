@@ -21,14 +21,14 @@ import java.util.Calendar;
  * Creates a JPanel with buttons and text fields inside. <p>
  * The user can interact with the buttons and text fields to create, edit, delete, and move between records.
  * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
- * @version 4.2, June 5, 2014
+ * @version 4.3, June 8, 2014
  */
 public class BindrBook extends JPanel implements ActionListener
 {
   /**
    * The array list that stores all the records
    */
-  ArrayList <StudentRecord> students = new ArrayList <StudentRecord> ();
+  ArrayList <StudentRecord> students = new ArrayList <StudentRecord> (0);
   /**
    * The integer that represents the current record number.
    */
@@ -62,9 +62,12 @@ public class BindrBook extends JPanel implements ActionListener
    */
   static JTextField inputLastName;
   
-  static JTextField inputTime;
-  
   static ButtonGroup signInOutGroup;
+  JRadioButton signInButton;
+  JRadioButton signOutButton;
+  JRadioButton absentButton;
+  
+  static JTextField inputTime;
   /**
    * The text field which will receive input for the reason number.
    */
@@ -72,7 +75,7 @@ public class BindrBook extends JPanel implements ActionListener
   /**
    * The label which will display the current record number and the total record number.
    */
-  JLabel currentLabel = new JLabel ("0 of 0");
+  JLabel currentLabel;
   /**
    * The file that the program currently has opened.
    */
@@ -90,8 +93,8 @@ public class BindrBook extends JPanel implements ActionListener
   
   StudentRecord s;
   
-  DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
-  Calendar cal = Calendar.getInstance();
+  Calendar cal;
+  DateFormat dateFormat;
   
   /**
    * The class constructor - Sets up the panel and tool bar and adds them to this JPanel.
@@ -119,8 +122,8 @@ public class BindrBook extends JPanel implements ActionListener
     JLabel lastName = new JLabel ("Last Name:");
     JLabel time = new JLabel ("Time:");
     JLabel reason = new JLabel ("Reason:");
-    JRadioButton signInButton = new JRadioButton ("Sign in");
-    JRadioButton signOutButton = new JRadioButton ("Sign out");
+    signInButton = new JRadioButton ("Sign In");
+    signOutButton = new JRadioButton ("Sign Out");
     
     //text fields
     inputFirstName = new JTextField (15);
@@ -128,37 +131,33 @@ public class BindrBook extends JPanel implements ActionListener
     inputTime = new JTextField (10);
     inputReason = new JTextField (15);
     
+    if (isTeacher)
+    {
+      currentLabel = new JLabel ("0 of 0");
+      p.add(currentLabel);
+    }
+    
     p.add (firstName, BorderLayout.LINE_START);
     p.add (inputFirstName);
     
     p.add (lastName, BorderLayout.LINE_START);
     p.add (inputLastName);
     
-    if (isTeacher)
-    {
-      p.add (time, BorderLayout.LINE_START);
-      p.add (inputTime);
-      cal = Calendar.getInstance();
-      //to fix. doens't work.
-      inputTime.setText ((String)dateFormat.format(cal.getTime()));
-    }
-    
     p.add (signInButton, BorderLayout.LINE_START);
     p.add (signOutButton);
     
     signInOutGroup = new ButtonGroup();
     signInOutGroup.add (signInButton);
+    
     signInOutGroup.add (signOutButton);
-    
-    signInButton.addActionListener (this);
-    signOutButton.addActionListener (this);
-    
     if (isTeacher)
     {
-      JRadioButton absentButton = new JRadioButton ("Absent");
+      absentButton = new JRadioButton ("Absent");
       p.add (absentButton);
       signInOutGroup.add (absentButton);
-      absentButton.addActionListener (this);
+      
+      p.add (time, BorderLayout.LINE_START);
+      p.add (inputTime);
     }
     
     p.add (reason, BorderLayout.LINE_START);
@@ -172,7 +171,7 @@ public class BindrBook extends JPanel implements ActionListener
                                        {
         public void actionPerformed (ActionEvent e)
         {
-          submitRecord(false);
+//          submitStudentRecord();
         }});
     }
     
@@ -185,23 +184,80 @@ public class BindrBook extends JPanel implements ActionListener
       addButtons (toolBar);
       add (toolBar, BorderLayout.PAGE_END);
     }
+    p.revalidate();
     add (p, BorderLayout.CENTER);
     
     currentLayout = true;
     displayBook(isTeacher);
   }
   
-  private void submitRecord(boolean isTeacher)
+  
+  private void submitTeacherRecord()
   {
-    cal = Calendar.getInstance();
+    String first = inputFirstName.getText();
+    String last = inputLastName.getText();
+    String attendance = getSelectedButtonText(signInOutGroup);
+    String time = inputTime.getText();
     
-    s = new StudentRecord (inputFirstName.getText(), inputLastName.getText() , getSelectedButtonText(signInOutGroup), dateFormat.format(cal.getTime()),inputReason.getText());
+    s = new StudentRecord (first, last, attendance, time, inputReason.getText());
     
-    if (!isTeacher || (isTeacher && currentRecord==-1))
+    if (currentRecord==-1)
       students.add(s);
     else
       students.set(currentRecord,s);
+    
+    if (!first.isEmpty())
+      s.setFirst(first);
+    if (!last.isEmpty())
+      s.setLast(last);
+    if (!attendance.isEmpty())
+      s.setAttendance(attendance);
+    if (!time.isEmpty())
+      s.setTime(time);
   }
+  
+//  private submitStudentRecord(String teacher, String first, String last, String attendance, String reason)
+//  {
+//    try
+//  {
+//    File teacherFile = new File(".//Users/"+teacher+".user");
+//      File tempFile = new File ("tempFile.user");
+//      cal = Calendar.getInstance();
+//dateFormat.format(cal.getTime()).toString());
+//      
+//     BufferedReader br = new BufferedReader(new FileReader(teacherFile));
+//      PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
+//      if (!br.readLine().equals ("EYESEEYES BINDR FILE"))
+//        JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
+//      else
+//      {
+//        pw.println("EYESEEYES BINDR FILE");
+//        
+//        int total = Integer.parseInt(br.readLine());
+//        total++;
+//        pw.println(total);
+//        
+//        for (int i=0; i<total; i++)
+//        {
+//            pw.println(br.readLine());
+//            pw.println(br.readLine());
+//        }
+//        pw.println(first);
+//        pw.println(last);
+//        pw.println(attendance);
+//        pw.println();
+//        pw.println(reason);
+//        
+//        tempFile.renameTo(inputFile);
+//        pw.close();
+//      }
+//    }
+//    catch (IOException ioe)
+//    {
+//      JOptionPane.showMessageDialog (b, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+//    }
+//  }
+  
   
   public String getSelectedButtonText(ButtonGroup signInOutGroup) 
   {
@@ -216,6 +272,7 @@ public class BindrBook extends JPanel implements ActionListener
     }
     return null;
   }
+  
   
   protected void addButtons (JToolBar toolBar)
   {
@@ -250,15 +307,16 @@ public class BindrBook extends JPanel implements ActionListener
     return button;
   }
   
+  
   public void makeTable ()
   {
     setLayout (new BorderLayout ());
     
     String[] columnNames = {"First Name" , "Last Name" , "In/Out/Absent" , "Time" , "Reason"};
-    String[][] tempValues = {{"Angela", "Jeong", "2:30", "Sign In", "Because"},
-      {"Lucas", "Lee", "3:00", "Sign Out", "Why not"},
-      {"Janelle", "Sookhai", "2:00", "Sign In", "Early"},
-      {"Nathan", "Can't Spell", "--", "Absent", "Skipped?"}};
+//    String[][] tempValues = {{"Angela", "Jeong", "2:30", "Sign In", "Because"},
+//      {"Lucas", "Lee", "3:00", "Sign Out", "Why not"},
+//      {"Janelle", "Sookhai", "2:00", "Sign In", "Early"},
+//      {"Nathan", "Can't Spell", "--", "Absent", "Skipped?"}};
     
     Color lightBlue = new Color (175, 229, 240); //light blue color for the text
     Color lightPink = new Color (247, 190, 214); //light pink color for the background
@@ -282,17 +340,20 @@ public class BindrBook extends JPanel implements ActionListener
       {
         TableModel model = (TableModel)e.getSource();
         int rNum = table.getSelectedRow();
-        String first = (String)model.getValueAt(rNum,1);
-        String last = (String)model.getValueAt(rNum,2);
+        String first = (String)model.getValueAt(rNum,0);
+        String last = (String)model.getValueAt(rNum,1);
+        String attendance = (String)model.getValueAt(rNum,2);
         String time = (String)model.getValueAt(rNum,3);
         
-        StudentRecord s = new StudentRecord(first,last,time,(String)model.getValueAt(rNum,4),(String)model.getValueAt(rNum,5));
+        StudentRecord s = new StudentRecord(first,last,attendance,time,(String)model.getValueAt(rNum,4));
         students.set(rNum,s);
         
         if(!first.isEmpty())
           s.setFirst(first);
         if (!last.isEmpty())
           s.setLast(last);
+        if (!attendance.isEmpty())
+          s.setAttendance(attendance);
         if (!time.isEmpty())
           s.setTime(time);
       }});
@@ -311,221 +372,213 @@ public class BindrBook extends JPanel implements ActionListener
     {
       dataValues [y][0] = students.get(y).getFirst();
       dataValues [y][1] = students.get(y).getLast();
-      dataValues [y][2] = students.get(y).getTime();
-      dataValues [y][3] = students.get(y).getAttendance();
+      dataValues [y][2] = students.get(y).getAttendance();
+      dataValues [y][3] = students.get(y).getTime();
       dataValues [y][4] = students.get(y).getReason();
     }
   }
   
-//  public void sort(int field)
-//  {
-//    int[] array = new int[students.size()];
-//    
-//    array = SortSearch.sort(field, dataValues);
-//    
-//    dataValues = new String [array.length][5];
-//    for (int y=0; y<array.length; y++)
-//    {
-//      dataValues [y][0] = Integer.toString(array[y]+1);
-//      dataValues [y][1] = students.get(array[y]).getFirst();
-//      dataValues [y][2] = students.get(array[y]).getLast();
-//      dataValues [y][3] = students.get(array[y]).getTime();
-//      dataValues [y][4] = students.get(array[y]).getReason();
-//    }
-//  }
-//  
-//  public void search(int type, int field, boolean isWhole, String match)
-//  {
-//    ArrayList<Integer> array = new ArrayList<>();
-//    
-//    System.out.println("in field is " + field);
-//    System.out.println("in match is " + match);
-//    
-//    if (type==1)
-//      array = SortSearch.sequentialSearch(field, isWhole, match, dataValues);
-//    else
-//      array = SortSearch.binarySearch(field, isWhole, match, dataValues);
-//    System.out.println("in search array is " + array.size());
-//    
-//    dataValues = new String [array.size()][5];
-//    for (int y=0; y<array.size(); y++)
-//    {
-//      dataValues [y][0] = Integer.toString(array.get(y)+1);
-//      dataValues [y][1] = students.get(array.get(y)).getFirst();
-//      dataValues [y][2] = students.get(array.get(y)).getLast();
-//      dataValues [y][3] = students.get(array.get(y)).getTime();
-//      dataValues [y][4] = students.get(array.get(y)).getReason();
-//    }
-//  }
+  public void saveTable()
+  {
+    StudentRecord s;
+    students.clear();
+    for (int i=0; i<dataValues.length; i++)
+    {
+      s = new StudentRecord (dataValues[i][0],dataValues[i][1],dataValues[i][2],dataValues[i][3],dataValues[i][4]);
+      students.add(s);
+      
+      // if (!dataValues[i][0].isEmpty())
+      s.setFirst(dataValues[i][0]);
+      if (!dataValues[i][1].isEmpty())
+        s.setLast(dataValues[i][1]);
+      if (!dataValues[i][2].isEmpty())
+        s.setAttendance(dataValues[i][2]);
+      if (!dataValues[i][3].isEmpty())
+        s.setTime(dataValues[i][3]);
+    }
+  }
   
-//  
-//  public void saveTable()
-//  {
-//    StudentRecord s;
-//    students.clear();
-//    for (int i=0; i<dataValues.length; i++)
-//    {
-//      s = new StudentRecord (dataValues[i][1],dataValues[i][2],dataValues[i][3],dataValues[i][4]);
-//      students.add(s);
-//      
-//      if (!dataValues[i][1].isEmpty())
-//        s.setFirst(dataValues[i][1]);
-//      if (!dataValues[i][2].isEmpty())
-//        s.setLast(dataValues[i][2]);
-//      if (!dataValues[i][3].isEmpty())
-//        s.setTime(dataValues[i][3]);
-//    }
-//  }
-//  
-//  
-//  private JFileChooser makeFileChooser(String fileName)
-//  {
-//    JFileChooser fc = new JFileChooser (".\\Files");
-//    
-//    fc.setFileSelectionMode (JFileChooser.FILES_ONLY);
-//    fc.setFileFilter(new ExampleFileFilter("liek", "[Insert Unique File Header Here]"));
-//    fc.setSelectedFile(new File(fileName));
-//    
-//    return fc;
-//  }
-//  
-//  /**
-//   * Creates a new file.
-//   * @param none
-//   */
-//  public void newFile()
-//  {
-//    currentFile = new File("Untitled");
-//    students.clear();
-//    currentRecord = -1;
-//  }
-//  
-//  /**
-//   * Opens an existing file.
-//   * @param none
-//   */
-//  public void openFile ()
-//  {
-//    JFileChooser fc = makeFileChooser(currentFile.getName().toString());
-//    
-//    int result = fc.showOpenDialog (this);
-//    if (result == JFileChooser.APPROVE_OPTION)
-//    {
-//      File file = fc.getSelectedFile();
-//      String name = file.getName();
-//      
-//      if (file == null || name.equals ("") || name.length () > 255)
-//        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
-//      
-//      else if (!name.substring(name.length()-4).equalsIgnoreCase("liek"))
-//        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
-//      
-//      else if (file.length()==0)
-//        JOptionPane.showMessageDialog (this, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
-//      
-//      else
-//      {
-//        try
-//        {
-//          BufferedReader br = new BufferedReader (new FileReader (file));
-//          
-//          if (!br.readLine().equals("[Insert Unique File Header Here]"))
-//            JOptionPane.showMessageDialog(this, "Invalid File Header", "Invalid File Header", JOptionPane.ERROR_MESSAGE);
-//          
-//          else
-//          {
-//            students.clear();
-//            int t = Integer.parseInt(br.readLine());
-//            
-//            for (int i=0; i<t; i++)
-//            {
-//              StudentRecord p = new StudentRecord (br.readLine(),br.readLine(),br.readLine(),br.readLine());
-//              students.add(i,p);
-//            }
-//            
-//            currentFile = file;
-//            currentRecord = 0;
-//          }
-//        }
-//        
-//        catch (IOException e)
-//        {
-//          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
-//        }
-//        
-//        catch (NumberFormatException e)
-//        {
-//          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
-//        }
-//      }
-//    }
-//  }
-////  
-//  /**
-//   * Saves the inputted data to the current file.
-//   * @param none
-//   */
-//  public void saveFile(boolean isSaveAs, File fileName)
-//  {
-//    if (isSaveAs==false && currentFile.getName().equals("Untitled"))
-//    {
-//      int confirm = JOptionPane.showConfirmDialog (this, "This is an Untitled File. Give it a title?", "Untitled File", JOptionPane.OK_CANCEL_OPTION);
-//      if (confirm == JOptionPane.OK_OPTION)
-//        saveAs();
-//    }
-//    
-//    else
-//    {
-//      try
-//      {
-//        PrintWriter pw = new PrintWriter (new FileWriter (fileName));
-//        
-//        pw.println("[Insert Unique File Header Here]");
-//        pw.println(students.size());
-//        
-//        for (int i=0;i<students.size();i++)
-//        {
-//          pw.println(students.get(i).getFirst());
-//          pw.println(students.get(i).getLast());
-//          pw.println(students.get(i).getTime());
-//          pw.println(students.get(i).getReason());
-//        }
-//        
-//        pw.close();
-//        isSaved = true;
-//      }
-//      
-//      catch (IOException e)
-//      {
-//        JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
-//      }
-//    }
-//  }
-////  
-//  /**
-//   * Saves the inputted data to a new or exisiting file.
-//   * @param none
-//   */
-//  public void saveAs ()
-//  {
-//    JFileChooser fc = makeFileChooser("Untitled");
-//    
-//    int result = fc.showSaveDialog(this);
-//    if (result == JFileChooser.APPROVE_OPTION)
-//    {
-//      File file = new File(fc.getSelectedFile()+".liek");
-//      String name = file.getName();
-//      
-//      if (file == null || name.equals ("") || name.length () > 255)
-//        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
-//      
-//      else if (!name.substring(name.length()-4).equalsIgnoreCase("liek"))
-//        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
-//      
-//      else
-//        saveFile(true, file);
-//    }
-//  }
+  public void sort(int field)
+  {
+    int[] array = new int[students.size()];
+    array = SortSearch.sort(field, dataValues);
+    
+    dataValues = new String [array.length][5];
+    for (int y=0; y<array.length; y++)
+    {
+      dataValues [y][0] = students.get(array[y]).getFirst();
+      dataValues [y][1] = students.get(array[y]).getLast();
+      dataValues [y][2] = students.get(array[y]).getAttendance();
+      dataValues [y][3] = students.get(array[y]).getTime();
+      dataValues [y][4] = students.get(array[y]).getReason();
+    }
+  }
+  
+  public void search(int field, boolean isWhole, String match)
+  {
+    ArrayList<Integer> array = new ArrayList<>();
+    array = SortSearch.search(field, isWhole, match, dataValues);
+    
+    dataValues = new String [array.size()][5];
+    for (int y=0; y<array.size(); y++)
+    {
+      dataValues [y][0] = students.get(array.get(y)).getFirst();
+      dataValues [y][1] = students.get(array.get(y)).getLast();
+      dataValues [y][2] = students.get(array.get(y)).getAttendance();
+      dataValues [y][3] = students.get(array.get(y)).getTime();
+      dataValues [y][4] = students.get(array.get(y)).getReason();
+    }
+  }
+  
+  private JFileChooser makeFileChooser(String fileName)
+  {
+    JFileChooser fc = new JFileChooser (".//Files");
+    
+    fc.setFileSelectionMode (JFileChooser.FILES_ONLY);
+    fc.setFileFilter(new ExampleFileFilter("bndr", "EYESEEYES BINDR FILE"));
+    fc.setSelectedFile(new File(fileName));
+    
+    return fc;
+  }
+  
+  /**
+   * Creates a new file.
+   * @param none
+   */
+  public void newFile()
+  {
+    currentFile = new File("Untitled");
+    students.clear();
+    currentRecord = -1;
+  }
+  
+  /**
+   * Opens an existing file.
+   * @param none
+   */
+  public void openFile ()
+  {
+    JFileChooser fc = makeFileChooser(currentFile.getName().toString());
+    
+    int result = fc.showOpenDialog (this);
+    if (result == JFileChooser.APPROVE_OPTION)
+    {
+      File file = fc.getSelectedFile();
+      String name = file.getName();
+      
+      if (file == null || name.equals ("") || name.length () > 255)
+        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
+      
+      else if (!name.substring(name.length()-4).equalsIgnoreCase("bndr"))
+        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
+      
+      else if (file.length()==0)
+        JOptionPane.showMessageDialog (this, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      
+      else
+      {
+        try
+        {
+          BufferedReader br = new BufferedReader (new FileReader (file));
+          
+          if (!br.readLine().equals("EYESEEYES BINDR FILE"))
+            JOptionPane.showMessageDialog(this, "Invalid File Header", "Invalid File Header", JOptionPane.ERROR_MESSAGE);
+          
+          else
+          {
+            students.clear();
+            int t = Integer.parseInt(br.readLine());
+            
+            for (int i=0; i<t; i++)
+            {
+              StudentRecord p = new StudentRecord (br.readLine(),br.readLine(),br.readLine(),br.readLine(),br.readLine());
+              students.add(i,p);
+            }
+            
+            currentFile = file;
+            currentRecord = 0;
+          }
+        }
+        
+        catch (IOException e)
+        {
+          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        catch (NumberFormatException e)
+        {
+          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+      }
+    }
+  }
+  
+  /**
+   * Saves the inputted data to the current file.
+   * @param none
+   */
+  public void saveFile(boolean isSaveAs, File fileName)
+  {
+    if (isSaveAs==false && currentFile.getName().equals("Untitled"))
+    {
+      int confirm = JOptionPane.showConfirmDialog (this, "This is an Untitled File. Give it a title?", "Untitled File", JOptionPane.OK_CANCEL_OPTION);
+      if (confirm == JOptionPane.OK_OPTION)
+        saveAs();
+    }
+    
+    else
+    {
+      try
+      {
+        PrintWriter pw = new PrintWriter (new FileWriter (fileName));
+        
+        pw.println("EYESEEYES BINDR FILE");
+        pw.println(students.size());
+        
+        for (int i=0;i<students.size();i++)
+        {
+          pw.println(students.get(i).getFirst());
+          pw.println(students.get(i).getLast());
+          pw.println(students.get(i).getAttendance());
+          pw.println(students.get(i).getTime());
+          pw.println(students.get(i).getReason());
+        }
+        
+        pw.close();
+        isSaved = true;
+      }
+      
+      catch (IOException e)
+      {
+        JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+  
+  /**
+   * Saves the inputted data to a new or exisiting file.
+   * @param none
+   */
+  public void saveAs ()
+  {
+    JFileChooser fc = makeFileChooser("Untitled");
+    
+    int result = fc.showSaveDialog(this);
+    if (result == JFileChooser.APPROVE_OPTION)
+    {
+      File file = new File(fc.getSelectedFile()+".bndr");
+      String name = file.getName();
+      
+      if (file == null || name.equals ("") || name.length () > 255)
+        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
+      
+      else if (!name.substring(name.length()-4).equalsIgnoreCase("bndr"))
+        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
+      
+      else
+        saveFile(true, file);
+    }
+  }
   
   /**
    * Performs specific tasks for each button the user selects.
@@ -537,7 +590,7 @@ public class BindrBook extends JPanel implements ActionListener
     
     if (PREVIOUS.equals (cmd))
     {
-      if (students.size()!=0)
+      if (students.size()!=0 && currentRecord!=-1)
       {
         if (currentRecord == 0)
           currentRecord = students.size()-1;
@@ -564,7 +617,7 @@ public class BindrBook extends JPanel implements ActionListener
     
     else if (SUBMIT.equals (cmd))
     {
-      submitRecord(true);
+      submitTeacherRecord();
     }
     else
     {
@@ -583,15 +636,12 @@ public class BindrBook extends JPanel implements ActionListener
         }
       }
     }
-//    displayBook ();
+    displayBook (true);
   }
   
   /**
    * Updates the text on all the text fields and label after a button was selected by the user.
-   * @param first String
-   * @param last String
-   * @param time String
-   * @param reason String
+   * @param isTeacher boolean
    */
   protected void displayBook (boolean isTeacher)
   {
@@ -599,21 +649,35 @@ public class BindrBook extends JPanel implements ActionListener
     {
       inputFirstName.setText("");
       inputLastName.setText("");
-      if (isTeacher)
-        inputTime.setText("");
       inputReason.setText("");
+      if (isTeacher)
+      {
+        cal = Calendar.getInstance();
+        dateFormat = new SimpleDateFormat("hh:mm a");
+        inputTime.setText(dateFormat.format(cal.getTime()).toString());
+      }
     }
     
     else
     {
       inputFirstName.setText(students.get(currentRecord).getFirst());
       inputLastName.setText(students.get(currentRecord).getLast());
+      String attendance = students.get(currentRecord).getAttendance();
+      if (attendance.equals("Sign In"))
+        signInButton.setSelected(true);
+      else if (attendance.equals("Sign Out"))
+        signOutButton.setSelected(true);
+      else if (attendance.equals("Absent"))
+        absentButton.setSelected(true);
+      else
+        signInOutGroup.clearSelection();
       if (isTeacher)
         inputTime.setText(students.get(currentRecord).getTime());
       inputReason.setText(students.get(currentRecord).getReason());
     }
     
-    currentLabel.setText((currentRecord+1) + " of " + students.size());
+    if (isTeacher)
+      currentLabel.setText((currentRecord+1) + " of " + students.size());
     updateUI();
   }
 }

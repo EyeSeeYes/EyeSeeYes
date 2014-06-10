@@ -3,14 +3,19 @@ import java.util.*;
 
 /**
  * The class that handles all the sorts and searches. <p>
- * Its methods are called by the AddressBook class when required. <p>
+ * Its methods are called by the BindrBook class when the search and sort items are selected in BindrDatabase. <p>
  * @author Angela Jeong
  * @version 2.0, May 14, 2014
  */
 public class SortSearch
 {
+  /**
+   * The sort method - sorts an array of data in alphanumerical order.
+   * @param field int The field that the data is to be sorted by.
+   * @param toSort String[][] The array that is to be sorted.
+   */
   public static int[] sort (int field, String[][] toSort)
-  {    
+  {
     int[] array = new int[toSort.length];
     int temp, j;
     
@@ -32,6 +37,13 @@ public class SortSearch
     return array;
   }
   
+  /**
+   * The search method - searches an array of data for a specific String.
+   * @param field int The field that the data will be searched for the matching String.
+   * @param isWhole boolean If true, the method will search for a complete match. Else, the method will search for partial matches.
+   * @param match String The String that will be searched for in the data.
+   * @param toSearch String[][] The data that is to be searched.
+   */
   public static ArrayList<Integer> search (int field, boolean isWhole, String match, String[][] toSearch)
   {
     ArrayList<Integer> array = new ArrayList<>();

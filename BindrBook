@@ -21,7 +21,7 @@ import java.util.Calendar;
  * Creates a JPanel with buttons and text fields inside. <p>
  * The user can interact with the buttons and text fields to create, edit, delete, and move between records.
  * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
- * @version 4.3, June 8, 2014
+ * @version 5.0, June 10, 2014
  */
 public class BindrBook extends JPanel implements ActionListener
 {
@@ -227,11 +227,11 @@ public class BindrBook extends JPanel implements ActionListener
       s.setTime(time);
   }
   
-  
   private void submitStudentRecord(File teacherFile, String first, String last, String attendance, String reason)
   {
     try
     {
+      System.out.println(teacherFile);
       File tempFile = new File ("tempFile.user");
       cal = Calendar.getInstance();
       dateFormat = new SimpleDateFormat("hh:mm a");
@@ -239,34 +239,46 @@ public class BindrBook extends JPanel implements ActionListener
       BufferedReader br = new BufferedReader(new FileReader(teacherFile));
       PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
       
-      if (!br.readLine().equals ("EYESEEYES BINDR FILE"))
-        JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
-      else
-      {
-        pw.println("EYESEEYES BINDR FILE");
-        
+      pw.println("EYESEEYES BINDR FILE");
+      br.readLine();
+      try
+      {        
         int total = Integer.parseInt(br.readLine());
         total++;
         pw.println(total);
         
-        for (int i=0; i<total*5; i++)
-          pw.println(br.readLine());
-        
-        pw.println(first);
-        pw.println(last);
-        pw.println(attendance);
-        pw.println(dateFormat.format(cal.getTime()).toString());
-        pw.println(reason);
-        
-        teacherFile.delete();
-        boolean renamed = tempFile.renameTo(teacherFile);
-        if(renamed)
-          JOptionPane.showMessageDialog (this, "Entry has been successfully submitted.");
-        else
-          JOptionPane.showMessageDialog (this, "Error has occured while attempting to submit entry.", "ERROR", JOptionPane.ERROR_MESSAGE);
-        
-        pw.close();
+        for (int i=0; i<(total-1)*5; i++)
+        {
+          String toPrint = br.readLine();
+          System.out.println(toPrint);
+          if(toPrint != null)
+            pw.println(toPrint);
+          else
+            pw.println("");
+        }
       }
+      catch(Exception e)
+      {
+        JOptionPane.showMessageDialog (this, "File cannot be read, rewriting... ", "Error", JOptionPane.ERROR_MESSAGE);
+        pw.println(0);
+      }
+      
+      pw.println(first);
+      pw.println(last);
+      pw.println(attendance);
+      pw.println(dateFormat.format(cal.getTime()).toString());
+      pw.println(reason);
+      
+      pw.close();
+      br.close();
+      
+      teacherFile.delete();
+      boolean renamed = tempFile.renameTo(teacherFile);
+      
+      if(renamed)
+        JOptionPane.showMessageDialog (this, "Entry has been successfully submitted.");
+      else
+        JOptionPane.showMessageDialog (this, "Error has occured while attempting to submit entry.", "ERROR", JOptionPane.ERROR_MESSAGE);
     }
     catch (IOException ioe)
     {

@@ -1,244 +1,713 @@
-//The "User Settings" class.
-
-import javax.swing.*;
+//The "BindrBook" class.
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.JToolBar;
+import javax.swing.JFrame;
+import javax.swing.table.*;
+import java.util.*;
 import java.io.*;
 
+import java.util.Enumeration;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.util.Calendar;
+
 /**
- * Handles everything to do with user settings, namely changing username/passwords, creating new accounts and deleting old accounts. <p>
- * It is called by the BindrDatabase class when any of the user settings menu items or the "New Account" button in the login panel is selected. <p>
- * @author Angela Jeong, Janelle Sookhai
- * @version 2.0 June 10, 2014
+ * The class that handles most of the data and manipulation thereof. <p>
+ * Creates a JPanel with buttons and text fields inside. <p>
+ * The user can interact with the buttons and text fields to create, edit, delete, and move between records.
+ * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
+ * @version 5.0, June 10, 2014
  */
-public class UserSettings extends JPanel
+public class BindrBook extends JPanel implements ActionListener
 {
   /**
-   * The BindrDatabase class.
+   * The array list that stores all the records
    */
-  BindrDatabase b;
+  ArrayList <StudentRecord> students = new ArrayList <StudentRecord> (0);
+  /**
+   * The integer that represents the current record number.
+   */
+  static int currentRecord = -1;
+  /**
+   * The action command for the "Previoius" button.
+   */
+  static final private String PREVIOUS = "previous";
+  /**
+   * The action command for the "New" button.
+   */
+  static final private String NEW = "new";
+  /**
+   * The action command for the "Submit" button.
+   */
+  static final private String SUBMIT = "submit";
+  /**
+   * The action command for the "Delete" button.
+   */
+  static final private String DELETE = "delete";
+  /**
+   * The action command for the "Next" button.
+   */
+  static final private String NEXT = "next";
+  /**
+   * The text field which will receive input for the first name.
+   */
+  static JTextField inputFirstName;
+  /**
+   * The text field which will receive input or the last name.
+   */
+  static JTextField inputLastName;
+  
+  static ButtonGroup signInOutGroup;
+  JRadioButton signInButton;
+  JRadioButton signOutButton;
+  JRadioButton absentButton;
+  
+  static JTextField inputTime;
+  /**
+   * The text field which will receive input for the reason number.
+   */
+  static JTextField inputReason;
+  /**
+   * The label which will display the current record number and the total record number.
+   */
+  JLabel currentLabel;
+  /**
+   * The file that the program currently has opened.
+   */
+  File currentFile = new File("Untitled");
+  /**
+   * The boolean that checks whether the current data has been saved to a file.
+   */
+  boolean isSaved = true;
+  boolean currentLayout = true;
+  
+  JTable table;
+  DefaultTableModel model;
+  static JScrollPane scroll;
+  String[][] dataValues;
+  
+  StudentRecord s;
+  
+  Calendar cal;
+  DateFormat dateFormat;
   
   /**
-   * The class constructor.
-   * The BindrDatabase class is pased in and the layout is set to null.
+   * The class constructor - Sets up the panel and tool bar and adds them to this JPanel.
+   * <p>
+   * @param none
    */
-  public UserSettings(BindrDatabase bd)
+  public BindrBook()
   {
-    b = bd;
-    setLayout (null);
+    //  String currentUser = user;
   }
   
   /**
-   * The change method - creates the panel used in changing usernames and passwords.
-   * @param currentUsername String The current user's username.
-   * @param currentPassword String The current user's password.
+   * The makeBook method - makes the binder-view used when adding in new records.
+   * Coded by Janelle
+   * @param boolean isTeacher
    */
-  public void change(final String currentUsername, final String currentPassword)
+  public void makeBook (final boolean isTeacher)
   {
-    JLabel newUsernameLabel = new JLabel ("New username: ");
-    JLabel currentPasswordLabel = new JLabel ("Current password: ");
-    JLabel newPasswordLabel = new JLabel ("New password: ");
-    JLabel confirmNewPasswordLabel = new JLabel ("Confirm new password: ");
+    setLayout (new BorderLayout ());
     
-    final JTextField  inputNewUsername = new JTextField(10);
-    final JPasswordField inputCurrentPassword = new JPasswordField(10);
-    final JPasswordField  inputNewPassword = new JPasswordField(10);
-    final JPasswordField  inputConfirmNewPassword = new JPasswordField(10);
+    JPanel p = new JPanel();
+    p.setLayout(new BoxLayout (p, BoxLayout.PAGE_AXIS));
     
-    JButton cancelUserSettingsButton = new JButton("Cancel");
-    JButton submitUserSettingsButton = new JButton("Submit");
+    //JLabels for the text fields
+    JLabel firstName = new JLabel ("First Name:");
+    JLabel lastName = new JLabel ("Last Name:");
+    JLabel time = new JLabel ("Time:");
+    JLabel reason = new JLabel ("Reason:");
+    signInButton = new JRadioButton ("Sign In");
+    signOutButton = new JRadioButton ("Sign Out");
     
-    cancelUserSettingsButton.addActionListener (new ActionListener ()
-                                                  {
-      /**
-       * actionPerformed method for the cancelUserSettingsButton.
-       * Exits the user setttings panel.
-       * @param e ActionEvent
-       */
-      public void actionPerformed (ActionEvent e)
-      {
-        b.exitSettings ();
-      }});
+    //text fields
+    final JTextField teacherName = new JTextField (15);
+    inputFirstName = new JTextField (15);
+    inputLastName = new JTextField (15);
+    inputTime = new JTextField (10);
+    inputReason = new JTextField (15);
     
-    submitUserSettingsButton.addActionListener (new ActionListener ()
-                                                  {
-      /**
-       * actionPerformed method for the submitUserSettingsButton.
-       * Calls the printLogin method if conditions are met, to change user settings.
-       * @param e ActionEvent
-       */
-      public void actionPerformed (ActionEvent e)
-      {
-        outerIf:
-          if (!inputCurrentPassword.getText().equals(currentPassword))
-          JOptionPane.showMessageDialog (b, "Incorrect Password", "ERROR", JOptionPane.ERROR_MESSAGE);
-          else
-          {
-            if(!inputNewPassword.getText().isEmpty() && !inputConfirmNewPassword.getText().isEmpty())
-            {
-              if (inputNewPassword.getText().length()<6 || inputNewPassword.getText().length()>12)
-              {
-                JOptionPane.showMessageDialog (b, "Password must be between 6 and 12 characters in length.", "ERROR", JOptionPane.ERROR_MESSAGE);
-                break outerIf;
-              }
-              else if (!inputNewPassword.getText().equals(inputConfirmNewPassword.getText()))
-              {
-                JOptionPane.showMessageDialog (b, "Passwords do not match.", "ERROR", JOptionPane.ERROR_MESSAGE);
-                break outerIf;
-              }
-            }
-            printLogin(0, currentUsername, inputNewUsername.getText(), currentPassword, inputNewPassword.getText());
-            JOptionPane.showMessageDialog (b, "Successfully changed account settings.");
-            b.exitSettings ();
-          }
-      }});
+    if (isTeacher)
+    {
+      currentLabel = new JLabel ("0 of 0");
+      p.add(currentLabel);
+    }
+    else
+    {
+      JLabel teacherNameLabel = new JLabel ("Teacher:");
+      p.add(teacherNameLabel);
+      p.add(teacherName);
+    }
     
-    newUsernameLabel.setBounds (81, 36, 200, 50);
-    add(newUsernameLabel);
-    inputNewUsername.setBounds (185, 48, 200, 25);
-    add(inputNewUsername);
-    currentPasswordLabel.setBounds (64, 68, 200, 50);
-    add(currentPasswordLabel);
-    inputCurrentPassword.setBounds (185, 79, 200, 25);
-    add(inputCurrentPassword);
-    newPasswordLabel.setBounds (82, 99, 200,  50);
-    add (newPasswordLabel);
-    inputNewPassword.setBounds (185, 110, 200, 25);
-    add (inputNewPassword);
-    confirmNewPasswordLabel.setBounds (34, 130, 200, 50);
-    add (confirmNewPasswordLabel);
-    inputConfirmNewPassword.setBounds (185, 141, 200, 25);
-    add (inputConfirmNewPassword);
-    cancelUserSettingsButton.setBounds (15, 252, 80, 27);
-    add (cancelUserSettingsButton);
-    submitUserSettingsButton.setBounds (200, 180, 80, 27);
-    add (submitUserSettingsButton);
-    validate();
-  }
-  
-  /**
-   * The delete method - deletes the current account.
-   * @param currentUsername String The current user's username.
-   * @param currentPassword String The current user's password.
-   */
-  public void delete(final String currentUsername, final String currentPassword)
-  {
-    JLabel confirmPasswordLabel = new JLabel ("Please enter your password: ");
-    final JPasswordField  confirmPassword = new JPasswordField(12);
+    p.add (firstName, BorderLayout.LINE_START);
+    p.add (inputFirstName);
     
-    JButton cancelDeleteAccountButton = new JButton("Cancel");
-    cancelDeleteAccountButton.addActionListener (new ActionListener ()
-                                                   {
-      /**
-       * actionPerformed method for the cancelDeleteAccountButton.
-       * Exits the user settings panel.
-       */
-      public void actionPerformed (ActionEvent e)
-      {
-        b.exitSettings ();
-      }});
+    p.add (lastName, BorderLayout.LINE_START);
+    p.add (inputLastName);
     
-    JButton deleteAccountButton = new JButton("Delete Account");
-    deleteAccountButton.addActionListener (new ActionListener ()
-                                             {
-      /**
-       * actionPerformed method for the deleteAccountButton.
-       * Calls the printLogin method if conditions are met to delete the account, and deletes the account's user file.
-       * @param e ActionEvent
-       */
-      public void actionPerformed (ActionEvent e)
-      {
-        if (!confirmPassword.getText().equals(currentPassword))
-          JOptionPane.showMessageDialog (b, "Incorrect Password", "ERROR", JOptionPane.ERROR_MESSAGE);
-        else
+    p.add (signInButton, BorderLayout.LINE_START);
+    p.add (signOutButton);
+    
+    signInOutGroup = new ButtonGroup();
+    signInOutGroup.add (signInButton);
+    
+    signInOutGroup.add (signOutButton);
+    if (isTeacher)
+    {
+      absentButton = new JRadioButton ("Absent");
+      p.add (absentButton);
+      signInOutGroup.add (absentButton);
+      
+      p.add (time, BorderLayout.LINE_START);
+      p.add (inputTime);
+    }
+    
+    p.add (reason, BorderLayout.LINE_START);
+    p.add (inputReason);
+    
+    if (!isTeacher)
+    {
+      JButton submitButton = new JButton ("Submit");
+      p.add (submitButton,BorderLayout.LINE_END);
+      submitButton.addActionListener(new ActionListener()
+                                       {
+        public void actionPerformed (ActionEvent e)
         {
-          int confirm = JOptionPane.showConfirmDialog (b, "If you delete your account, your account file will be deleted. Do you still wish to delete your account?", "Delete Account", JOptionPane.OK_CANCEL_OPTION);
-          
-          if (confirm==JOptionPane.OK_OPTION)
-          {
-            File deleteFile = new File(".//Users/"+currentUsername+".user");
-            deleteFile.delete();
-            printLogin(1,currentUsername,null,currentPassword,null);
-            JOptionPane.showMessageDialog (b, "Successfully deleted account.");
-            System.exit(0);
-          }
-        }
-      }});
+          File teacherFile = new File(".//Users/"+teacherName.getText()+"/UserFile.user");
+          if (!teacherFile.isFile())
+            JOptionPane.showMessageDialog (((Component)e.getSource()).getParent(), "The teacher you entered does not exist.", "ERROR", JOptionPane.ERROR_MESSAGE);
+          else
+            submitStudentRecord(teacherFile,inputFirstName.getText(),inputLastName.getText(),getSelectedButtonText(signInOutGroup),inputReason.getText());
+        }});
+    }
     
-    add(confirmPasswordLabel);
-    add(confirmPassword);
-    add(cancelDeleteAccountButton);
-    add(deleteAccountButton);
-    validate();
+    setFont(new Font ("Helvetica" , Font.PLAIN , 16));
+    
+    if (isTeacher)
+    {
+      JToolBar toolBar = new JToolBar ("Still draggable");
+      toolBar.setLayout (new FlowLayout (FlowLayout.CENTER));
+      addButtons (toolBar);
+      add (toolBar, BorderLayout.PAGE_END);
+    }
+    p.revalidate();
+    add (p, BorderLayout.CENTER);
+    
+    currentLayout = true;
+    displayBook(isTeacher);
   }
   
-  /**
-   * The printLogin method - prints the list of accounts onto the login file.
-   * The method also does any manipulations of accounts within the file, namely changing username/passwords, and adding or deleting accounts.
-   * @param method int The integer that determines whether the method will change username/passwords, add a new account, or delete an old account.
-   * @param currentUsername String The current account's username.
-   * @param newUsername String The new username (null if method is not 0).
-   * @param currentPassword String The current account's password.
-   * @param newPassword String The new password (null if method is not 0).
-   */
-  public void printLogin(int method, String currentUsername, String newUsername, String currentPassword, String newPassword)
+  
+  private void submitTeacherRecord()
+  {
+    String first = inputFirstName.getText();
+    String last = inputLastName.getText();
+    String attendance = getSelectedButtonText(signInOutGroup);
+    String time = inputTime.getText();
+    
+    s = new StudentRecord (first, last, attendance, time, inputReason.getText());
+    
+    if (currentRecord==-1)
+      students.add(s);
+    else
+      students.set(currentRecord,s);
+    
+    if (!first.isEmpty())
+      s.setFirst(first);
+    if (!last.isEmpty())
+      s.setLast(last);
+    if (!attendance.isEmpty())
+      s.setAttendance(attendance);
+    if (!time.isEmpty())
+      s.setTime(time);
+  }
+  
+  private void submitStudentRecord(File teacherFile, String first, String last, String attendance, String reason)
   {
     try
     {
-      File inputFile = new File (".//TeacherLogin/teacherInfo.login");
-      File tempFile = new File ("tempFile.login");
+      System.out.println(teacherFile);
+      File tempFile = new File ("tempFile.user");
+      cal = Calendar.getInstance();
+      dateFormat = new SimpleDateFormat("hh:mm a");
       
-      BufferedReader br = new BufferedReader(new FileReader(inputFile));
+      BufferedReader br = new BufferedReader(new FileReader(teacherFile));
       PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
       
-      if (!br.readLine().equals ("EYESEEYES BINDR FILE"))
-        JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
-      else
-      {
-        pw.println("EYESEEYES BINDR FILE");
-        
+      pw.println("EYESEEYES BINDR FILE");
+      br.readLine();
+      try
+      {        
         int total = Integer.parseInt(br.readLine());
-        if (method==1)
-          total++;
-        else
-        {
-          if (method==2)
-            total--;
-        }
+        total++;
         pw.println(total);
         
-        for (int i=0; i<total; i++)
+        for (int i=0; i<(total-1)*5; i++)
         {
-          String currentLine = br.readLine();
-          if (method==0 && currentLine.equals(currentUsername))
-          {
-            if (newUsername.isEmpty()||newUsername.equals(null))
-              pw.println(currentUsername);
-            else
-              pw.println(newUsername);
-            if (newPassword.isEmpty()||newUsername.equals(null))
-              pw.println(currentPassword);
-            else
-              pw.println(newPassword);
-          }
+          String toPrint = br.readLine();
+          System.out.println(toPrint);
+          if(toPrint != null)
+            pw.println(toPrint);
           else
-          {
-            pw.println(currentLine);
-            pw.println(br.readLine());
-          }
+            pw.println("");
         }
-        
-        br.close();
-        pw.close();
-        
-        inputFile.delete();
-        tempFile.renameTo(inputFile);
       }
+      catch(Exception e)
+      {
+        JOptionPane.showMessageDialog (this, "File cannot be read, rewriting... ", "Error", JOptionPane.ERROR_MESSAGE);
+        pw.println(0);
+      }
+      
+      pw.println(first);
+      pw.println(last);
+      pw.println(attendance);
+      pw.println(dateFormat.format(cal.getTime()).toString());
+      pw.println(reason);
+      
+      pw.close();
+      br.close();
+      
+      teacherFile.delete();
+      boolean renamed = tempFile.renameTo(teacherFile);
+      
+      if(renamed)
+        JOptionPane.showMessageDialog (this, "Entry has been successfully submitted.");
+      else
+        JOptionPane.showMessageDialog (this, "Error has occured while attempting to submit entry.", "ERROR", JOptionPane.ERROR_MESSAGE);
     }
     catch (IOException ioe)
     {
-      System.out.println(ioe);
-      JOptionPane.showMessageDialog (b, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog (this, "Unknown error has occured.", "ERROR", JOptionPane.ERROR_MESSAGE);
     }
+  }
+  
+  
+  public String getSelectedButtonText(ButtonGroup signInOutGroup) 
+  {
+    for (Enumeration<AbstractButton> buttons = signInOutGroup.getElements(); buttons.hasMoreElements();) 
+    {
+      AbstractButton button = buttons.nextElement();
+      
+      if (button.isSelected()) 
+      {
+        return button.getText();
+      }
+    }
+    return null;
+  }
+  
+  
+  protected void addButtons (JToolBar toolBar)
+  {
+    JButton button = null;
+    
+    button = makeButton ("Back", PREVIOUS, "Back to previous record");
+    toolBar.add (button);
+    
+    button = makeButton ("New", NEW, "Create a new record");
+    toolBar.add (button);
+    
+    button = makeButton ("Submit", SUBMIT, "Submits a record");
+    toolBar.add (button);
+    
+    button = makeButton ("Delete", DELETE, "Delete record");
+    toolBar.add (button);
+    
+    button = makeButton ("Forward", NEXT, "Forward to next record");
+    toolBar.add (button);
+  }
+  
+  protected JButton makeButton (String imageName, String actionCommand, String toolTipText)
+  {
+    Image imageGIF = Toolkit.getDefaultToolkit ().getImage ("Graphics/" + imageName + ".gif");
+    JButton button = new JButton ();
+    
+    button.setToolTipText (toolTipText);
+    button.setIcon (new ImageIcon (imageGIF));
+    button.setActionCommand (actionCommand);
+    button.addActionListener (this);
+    
+    return button;
+  }
+  
+  
+  public void makeTable ()
+  {
+    setLayout (new BorderLayout ());
+    
+    String[] columnNames = {"First Name" , "Last Name" , "In/Out/Absent" , "Time" , "Reason"};
+//    String[][] tempValues = {{"Angela", "Jeong", "2:30", "Sign In", "Because"},
+//      {"Lucas", "Lee", "3:00", "Sign Out", "Why not"},
+//      {"Janelle", "Sookhai", "2:00", "Sign In", "Early"},
+//      {"Nathan", "Can't Spell", "--", "Absent", "Skipped?"}};
+    
+    Color lightBlue = new Color (175, 229, 240); //light blue color for the text
+    Color lightPink = new Color (247, 190, 214); //light pink color for the background
+    Color lightPurple = new Color (210, 175, 227); //light purple color for the grid lines
+    
+    model = new DefaultTableModel (dataValues , columnNames);
+    table = new JTable (model);
+    
+    table.setRowHeight (20);
+    table.setShowVerticalLines (true);
+    table.setShowHorizontalLines (true);
+    
+    table.setSelectionForeground (Color.green);
+    table.setSelectionBackground (Color.red);
+    table.setGridColor (Color.blue);
+    table.setVisible(true);
+    
+    table.getModel().addTableModelListener(new TableModelListener(){
+      @Override
+      public void tableChanged(TableModelEvent e) 
+      {
+        TableModel model = (TableModel)e.getSource();
+        int rNum = table.getSelectedRow();
+        String first = (String)model.getValueAt(rNum,0);
+        String last = (String)model.getValueAt(rNum,1);
+        String attendance = (String)model.getValueAt(rNum,2);
+        String time = (String)model.getValueAt(rNum,3);
+        
+        StudentRecord s = new StudentRecord(first,last,attendance,time,(String)model.getValueAt(rNum,4));
+        students.set(rNum,s);
+        
+        if(!first.isEmpty())
+          s.setFirst(first);
+        if (!last.isEmpty())
+          s.setLast(last);
+        if (!attendance.isEmpty())
+          s.setAttendance(attendance);
+        if (!time.isEmpty())
+          s.setTime(time);
+      }});
+    
+    scroll = new JScrollPane (table);
+    add (scroll, BorderLayout.CENTER);
+    
+    currentLayout = false;
+  }
+  
+  public void createData ()
+  {
+    dataValues = new String [students.size()] [5];
+    
+    for (int y = 0; y < students.size(); y++)
+    {
+      dataValues [y][0] = students.get(y).getFirst();
+      dataValues [y][1] = students.get(y).getLast();
+      dataValues [y][2] = students.get(y).getAttendance();
+      dataValues [y][3] = students.get(y).getTime();
+      dataValues [y][4] = students.get(y).getReason();
+    }
+  }
+  
+  public void saveTable()
+  {
+    StudentRecord s;
+    students.clear();
+    for (int i=0; i<dataValues.length; i++)
+    {
+      s = new StudentRecord (dataValues[i][0],dataValues[i][1],dataValues[i][2],dataValues[i][3],dataValues[i][4]);
+      students.add(s);
+      
+      // if (!dataValues[i][0].isEmpty())
+      s.setFirst(dataValues[i][0]);
+      if (!dataValues[i][1].isEmpty())
+        s.setLast(dataValues[i][1]);
+      if (!dataValues[i][2].isEmpty())
+        s.setAttendance(dataValues[i][2]);
+      if (!dataValues[i][3].isEmpty())
+        s.setTime(dataValues[i][3]);
+    }
+  }
+  
+  public void sort(int field)
+  {
+    int[] array = new int[students.size()];
+    array = SortSearch.sort(field, dataValues);
+    
+    dataValues = new String [array.length][5];
+    for (int y=0; y<array.length; y++)
+    {
+      dataValues [y][0] = students.get(array[y]).getFirst();
+      dataValues [y][1] = students.get(array[y]).getLast();
+      dataValues [y][2] = students.get(array[y]).getAttendance();
+      dataValues [y][3] = students.get(array[y]).getTime();
+      dataValues [y][4] = students.get(array[y]).getReason();
+    }
+  }
+  
+  public void search(int field, boolean isWhole, String match)
+  {
+    ArrayList<Integer> array = new ArrayList<>();
+    array = SortSearch.search(field, isWhole, match, dataValues);
+    
+    dataValues = new String [array.size()][5];
+    for (int y=0; y<array.size(); y++)
+    {
+      dataValues [y][0] = students.get(array.get(y)).getFirst();
+      dataValues [y][1] = students.get(array.get(y)).getLast();
+      dataValues [y][2] = students.get(array.get(y)).getAttendance();
+      dataValues [y][3] = students.get(array.get(y)).getTime();
+      dataValues [y][4] = students.get(array.get(y)).getReason();
+    }
+  }
+  
+  private JFileChooser makeFileChooser(String fileName)
+  {
+    JFileChooser fc = new JFileChooser (".//Files");
+    
+    fc.setFileSelectionMode (JFileChooser.FILES_ONLY);
+    fc.setFileFilter(new ExampleFileFilter("bndr", "EYESEEYES BINDR FILE"));
+    fc.setSelectedFile(new File(fileName));
+    
+    return fc;
+  }
+  
+  /**
+   * Creates a new file.
+   * @param none
+   */
+  public void newFile()
+  {
+    currentFile = new File("Untitled");
+    students.clear();
+    currentRecord = -1;
+  }
+  
+  /**
+   * Opens an existing file.
+   * @param none
+   */
+  public void openFile ()
+  {
+    JFileChooser fc = makeFileChooser(currentFile.getName().toString());
+    
+    int result = fc.showOpenDialog (this);
+    if (result == JFileChooser.APPROVE_OPTION)
+    {
+      File file = fc.getSelectedFile();
+      String name = file.getName();
+      
+      if (file == null || name.equals ("") || name.length () > 255)
+        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
+      
+      else if (!name.substring(name.length()-4).equalsIgnoreCase("bndr"))
+        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
+      
+      else if (file.length()==0)
+        JOptionPane.showMessageDialog (this, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      
+      else
+      {
+        try
+        {
+          BufferedReader br = new BufferedReader (new FileReader (file));
+          
+          if (!br.readLine().equals("EYESEEYES BINDR FILE"))
+            JOptionPane.showMessageDialog(this, "Invalid File Header", "Invalid File Header", JOptionPane.ERROR_MESSAGE);
+          
+          else
+          {
+            students.clear();
+            int t = Integer.parseInt(br.readLine());
+            
+            for (int i=0; i<t; i++)
+            {
+              StudentRecord p = new StudentRecord (br.readLine(),br.readLine(),br.readLine(),br.readLine(),br.readLine());
+              students.add(i,p);
+            }
+            
+            currentFile = file;
+            currentRecord = 0;
+          }
+        }
+        
+        catch (IOException e)
+        {
+          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        catch (NumberFormatException e)
+        {
+          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+      }
+    }
+  }
+  
+  /**
+   * Saves the inputted data to the current file.
+   * @param none
+   */
+  public void saveFile(boolean isSaveAs, File fileName)
+  {
+    if (isSaveAs==false && currentFile.getName().equals("Untitled"))
+    {
+      int confirm = JOptionPane.showConfirmDialog (this, "This is an Untitled File. Give it a title?", "Untitled File", JOptionPane.OK_CANCEL_OPTION);
+      if (confirm == JOptionPane.OK_OPTION)
+        saveAs();
+    }
+    
+    else
+    {
+      try
+      {
+        PrintWriter pw = new PrintWriter (new FileWriter (fileName));
+        
+        pw.println("EYESEEYES BINDR FILE");
+        pw.println(students.size());
+        
+        for (int i=0;i<students.size();i++)
+        {
+          pw.println(students.get(i).getFirst());
+          pw.println(students.get(i).getLast());
+          pw.println(students.get(i).getAttendance());
+          pw.println(students.get(i).getTime());
+          pw.println(students.get(i).getReason());
+        }
+        
+        pw.close();
+        isSaved = true;
+      }
+      
+      catch (IOException e)
+      {
+        JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+  
+  /**
+   * Saves the inputted data to a new or exisiting file.
+   * @param none
+   */
+  public void saveAs ()
+  {
+    JFileChooser fc = makeFileChooser("Untitled");
+    
+    int result = fc.showSaveDialog(this);
+    if (result == JFileChooser.APPROVE_OPTION)
+    {
+      File file = new File(fc.getSelectedFile()+".bndr");
+      String name = file.getName();
+      
+      if (file == null || name.equals ("") || name.length () > 255)
+        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
+      
+      else if (!name.substring(name.length()-4).equalsIgnoreCase("bndr"))
+        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
+      
+      else
+        saveFile(true, file);
+    }
+  }
+  
+  /**
+   * Performs specific tasks for each button the user selects.
+   * @param e ActionEvent
+   */
+  public void actionPerformed (ActionEvent e)
+  {
+    String cmd = e.getActionCommand ();
+    
+    if (PREVIOUS.equals (cmd))
+    {
+      if (students.size()!=0)
+      {
+        if (currentRecord <= 0)
+          currentRecord = students.size()-1;
+        else
+          currentRecord--;
+      }
+    }
+    
+    else if (NEXT.equals (cmd))
+    {
+      if (students.size()!=0)
+      {
+        if (currentRecord == students.size()-1)
+          currentRecord = 0;
+        else
+          currentRecord++;
+      }
+    }
+    
+    else if (NEW.equals (cmd))
+    {
+      currentRecord = -1;
+    }
+    
+    else if (SUBMIT.equals (cmd))
+    {
+      submitTeacherRecord();
+    }
+    else
+    {
+      if (DELETE.equals (cmd))
+      {
+        if (students.size()!=0)
+        {
+          if (currentRecord==-1)
+            currentRecord=0;
+          else
+          {
+            students.remove(currentRecord);
+            currentRecord--;
+            isSaved = false;
+          }
+        }
+      }
+    }
+    displayBook (true);
+  }
+  
+  /**
+   * Updates the text on all the text fields and label after a button was selected by the user.
+   * @param isTeacher boolean
+   */
+  protected void displayBook (boolean isTeacher)
+  {
+    if (currentRecord == -1)
+    {
+      inputFirstName.setText("");
+      inputLastName.setText("");
+      inputReason.setText("");
+      signInButton.setSelected(true);
+      if (isTeacher)
+      {
+        cal = Calendar.getInstance();
+        dateFormat = new SimpleDateFormat("hh:mm a");
+        inputTime.setText(dateFormat.format(cal.getTime()).toString());
+      }
+    }
+    
+    else
+    {
+      inputFirstName.setText(students.get(currentRecord).getFirst());
+      inputLastName.setText(students.get(currentRecord).getLast());
+      String attendance = students.get(currentRecord).getAttendance();
+      if (attendance.equals("Sign In"))
+        signInButton.setSelected(true);
+      else if (attendance.equals("Sign Out"))
+        signOutButton.setSelected(true);
+      else if (attendance.equals("Absent"))
+        absentButton.setSelected(true);
+      else
+        signInOutGroup.clearSelection();
+      if (isTeacher)
+        inputTime.setText(students.get(currentRecord).getTime());
+      inputReason.setText(students.get(currentRecord).getReason());
+    }
+    
+    if (isTeacher)
+      currentLabel.setText((currentRecord+1) + " of " + students.size());
+    updateUI();
   }
 }

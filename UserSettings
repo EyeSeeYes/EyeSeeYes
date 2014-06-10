@@ -177,8 +177,11 @@ public class UserSettings extends JPanel
             pw.println(br.readLine());
           }
         }
+        
         br.close();
         pw.close();
+        
+        inputFile.delete();
         tempFile.renameTo(inputFile);
       }
     }

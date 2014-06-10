@@ -345,20 +345,6 @@ public class BindrBook extends JPanel implements ActionListener
     }
   }
   
-  public String getSelectedButtonText(ButtonGroup signInOutGroup) 
-  {
-    for (Enumeration<AbstractButton> buttons = signInOutGroup.getElements(); buttons.hasMoreElements();) 
-    {
-      AbstractButton button = buttons.nextElement();
-      
-      if (button.isSelected()) 
-      {
-        return button.getText();
-      }
-    }
-    return null;
-  }
-  
   /**
    * Gets which button from the button group (signInOutGroup) is selected and changes that into a string
    * so it can go into the table. 

@@ -394,11 +394,13 @@ public class BindrDatabase extends JFrame implements ActionListener
     JMenuItem sortItem = new JMenuItem ("Sort");
     JMenuItem searchItem = new JMenuItem ("Search");
     JMenuItem userSettingsItem = new JMenuItem ("User Settings");
+    JMenuItem helpItem = new JMenuItem ("Help");
     
     JMenu fileMenu = new JMenu ("File");
     JMenu displayMenu = new JMenu ("Display");
     JMenu sortSearchMenu = new JMenu ("Sort/Search");
     JMenu settingsMenu  = new JMenu ("Settings");
+    JMenu helpMenu = new JMenu ("Help");
     JMenuBar myMenus = new JMenuBar ();
     
     fileMenu.add (newItem);
@@ -412,10 +414,12 @@ public class BindrDatabase extends JFrame implements ActionListener
     sortSearchMenu.add (sortItem);
     sortSearchMenu.add(searchItem);
     settingsMenu.add (userSettingsItem);
+    helpMenu.add (helpItem);
     myMenus.add (fileMenu);
     myMenus.add (displayMenu);
     myMenus.add(sortSearchMenu);;
     myMenus.add (settingsMenu);
+    myMenus.add (helpMenu);
     setJMenuBar (myMenus);
     
     newItem.addActionListener (this);
@@ -429,6 +433,7 @@ public class BindrDatabase extends JFrame implements ActionListener
     sortItem.addActionListener(this);
     searchItem.addActionListener(this);
     userSettingsItem.addActionListener (this);
+    helpItem.addActionListener(this);
     
     SwingUtilities.updateComponentTreeUI(this);
   }
@@ -770,6 +775,22 @@ public class BindrDatabase extends JFrame implements ActionListener
       if (b.currentLayout)
         displayLayout(false,true);
       makeSearchDialog();
+    }
+    
+    else if (e.getActionCommand ().equals ("Help"))
+    {
+      
+//messageDialog ("Refer to User Manual for help");
+// “...” indicates path of chm file
+      String progpath = new String ("hh.exe BinderHelpFile.chm ");
+      try
+      {
+        Runtime.getRuntime ( ).exec (progpath);
+      }
+      catch (IOException easasads)
+      {
+         JOptionPane.showMessageDialog(this, "Couldn't Find Help File.", "Error", JOptionPane.ERROR_MESSAGE);
+      }
     }
     
     else 

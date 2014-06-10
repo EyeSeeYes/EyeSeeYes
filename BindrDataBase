@@ -38,6 +38,8 @@ public class BindrDatabase extends JFrame implements ActionListener
    */
   public BindrDatabase()
   {
+    u = new UserSettings(this);
+    
     setSize (500, 350);
     setResizable(false);
     setLocationRelativeTo(null);
@@ -200,6 +202,18 @@ public class BindrDatabase extends JFrame implements ActionListener
       
       public void actionPerformed (ActionEvent e)
       {
+        try
+        {
+          PrintWriter newWriter = new PrintWriter(".//Users/"+usernameField.getText()+".user");
+          newWriter.println("EYESEEYES BINDR FILE");
+          newWriter.println("0");
+          newWriter.close();
+        }
+        catch (IOException ioe)
+        {
+          JOptionPane.showMessageDialog (((Component)e.getSource()).getParent(), "Failed to create new account.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
         u.printLogin(1,usernameField.getText(),null,passwordField.getText(),null);
         remove(cardLayoutPanel);
         makeDatabaseApp ();

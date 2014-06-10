@@ -216,47 +216,46 @@ public class BindrBook extends JPanel implements ActionListener
       s.setTime(time);
   }
   
-//  private submitStudentRecord(String teacher, String first, String last, String attendance, String reason)
-//  {
-//    try
-//  {
-//    File teacherFile = new File(".//Users/"+teacher+".user");
-//      File tempFile = new File ("tempFile.user");
-//      cal = Calendar.getInstance();
-//dateFormat.format(cal.getTime()).toString());
-//      
-//     BufferedReader br = new BufferedReader(new FileReader(teacherFile));
-//      PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
-//      if (!br.readLine().equals ("EYESEEYES BINDR FILE"))
-//        JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
-//      else
-//      {
-//        pw.println("EYESEEYES BINDR FILE");
-//        
-//        int total = Integer.parseInt(br.readLine());
-//        total++;
-//        pw.println(total);
-//        
-//        for (int i=0; i<total; i++)
-//        {
-//            pw.println(br.readLine());
-//            pw.println(br.readLine());
-//        }
-//        pw.println(first);
-//        pw.println(last);
-//        pw.println(attendance);
-//        pw.println();
-//        pw.println(reason);
-//        
-//        tempFile.renameTo(inputFile);
-//        pw.close();
-//      }
-//    }
-//    catch (IOException ioe)
-//    {
-//      JOptionPane.showMessageDialog (b, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
-//    }
-//  }
+  
+  private void submitStudentRecord(String teacher, String first, String last, String attendance, String reason)
+  {
+    try
+    {
+      File teacherFile = new File(".//Users/"+teacher+".user");
+      File tempFile = new File ("tempFile.user");
+      cal = Calendar.getInstance();
+      
+      BufferedReader br = new BufferedReader(new FileReader(teacherFile));
+      PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
+      
+      if (!br.readLine().equals ("EYESEEYES BINDR FILE"))
+        JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        pw.println("EYESEEYES BINDR FILE");
+        
+        int total = Integer.parseInt(br.readLine());
+        total++;
+        pw.println(total);
+        
+        for (int i=0; i<total*5; i++)
+          pw.println(br.readLine());
+        
+        pw.println(first);
+        pw.println(last);
+        pw.println(attendance);
+        pw.println(dateFormat.format(cal.getTime()).toString());
+        pw.println(reason);
+        
+        tempFile.renameTo(teacherFile);
+        pw.close();
+      }
+    }
+    catch (IOException ioe)
+    {
+      JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+    }
+  }
   
   
   public String getSelectedButtonText(ButtonGroup signInOutGroup) 
@@ -590,9 +589,9 @@ public class BindrBook extends JPanel implements ActionListener
     
     if (PREVIOUS.equals (cmd))
     {
-      if (students.size()!=0 && currentRecord!=-1)
+      if (students.size()!=0)
       {
-        if (currentRecord == 0)
+        if (currentRecord <= 0)
           currentRecord = students.size()-1;
         else
           currentRecord--;
@@ -650,6 +649,7 @@ public class BindrBook extends JPanel implements ActionListener
       inputFirstName.setText("");
       inputLastName.setText("");
       inputReason.setText("");
+      signInButton.setSelected(true);
       if (isTeacher)
       {
         cal = Calendar.getInstance();

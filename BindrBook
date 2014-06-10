@@ -148,17 +148,13 @@ public class BindrBook extends JPanel implements ActionListener
     
     signInOutGroup = new ButtonGroup();
     signInOutGroup.add (signInButton);
+    
     signInOutGroup.add (signOutButton);
-    
-    signInButton.addActionListener (this);
-    signOutButton.addActionListener (this);
-    
     if (isTeacher)
     {
       absentButton = new JRadioButton ("Absent");
       p.add (absentButton);
       signInOutGroup.add (absentButton);
-      absentButton.addActionListener (this);
       
       p.add (time, BorderLayout.LINE_START);
       p.add (inputTime);
@@ -175,7 +171,7 @@ public class BindrBook extends JPanel implements ActionListener
                                        {
         public void actionPerformed (ActionEvent e)
         {
-//          submitRecord(false);
+//          submitStudentRecord();
         }});
     }
     
@@ -219,7 +215,7 @@ public class BindrBook extends JPanel implements ActionListener
     if (!time.isEmpty())
       s.setTime(time);
   }
-//  
+  
 //  private submitStudentRecord(String teacher, String first, String last, String attendance, String reason)
 //  {
 //    try
@@ -653,7 +649,6 @@ public class BindrBook extends JPanel implements ActionListener
     {
       inputFirstName.setText("");
       inputLastName.setText("");
-      signInButton.setSelected(true);
       inputReason.setText("");
       if (isTeacher)
       {

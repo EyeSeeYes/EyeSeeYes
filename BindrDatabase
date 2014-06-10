@@ -1,0 +1,853 @@
+//The "DatabaseApp" class.
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.*;
+import javax.imageio.*;
+import javax.swing.*;
+import java.io.*;
+
+/**
+ * The class that runs the program. <p>
+ * Creates a new instance of BindrBook and adds it to a window. <p>
+ * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
+ * @version 5.0, June 10, 2014
+ */
+public class BindrDatabase extends JFrame implements ActionListener
+{
+  /**
+   * An instance of the BindrBook class to be added to this class.
+   */
+  BindrBook b;
+  /**
+   * An instance of the UserSettings class to be added to this class.
+   */
+  UserSettings u;
+  /**
+   * Buffered img - Used to import the EyeSeeYesLogo.
+   */
+  BufferedImage img;
+  /**
+   * CardLayout cards - New card layout used for the login and selection screens.
+   */
+  CardLayout cards = new CardLayout ();
+  /**
+   * JPanel the card layouts are added to.
+   */
+  JPanel cardLayoutPanel = new JPanel (cards);
+  /**
+   * JTextField usernameField - Text field for the user to enter their username. 
+   */
+  JTextField usernameField = new JTextField (); 
+  /**
+   * JPasswordField passwordField - Password field for the user to enter their password.
+   */
+  JPasswordField passwordField = new JPasswordField ();
+  /**
+   * currentUsername - String that stores the user's current username.
+   * currentPassword - String that stores the user's current password.
+   */
+  String currentUsername, currentPassword;
+  
+  
+  ButtonGroup group, fieldGroup, settingsGroup;
+  boolean isWhole;
+  
+  /**
+   * The class constructor - Creates a new instance of BindrBook and adds it to a window.
+   * Coded by Angela
+   * @param none
+   */
+  public BindrDatabase()
+  {
+    setSize (500, 350);
+    setResizable(false);
+    setLocationRelativeTo(null);
+    setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
+    setVisible(true);
+    
+    try
+    {
+      splashScreen();
+    }
+    catch (Exception e)
+    {
+    }
+    accessLevels();
+    add(cardLayoutPanel);
+    
+    SwingUtilities.updateComponentTreeUI(this);
+  }
+  
+  /**
+   * Makes the splash screen with the pretty logo on it. (Whoever made that logo is a great artist)
+   * Coded by Nathan
+   * @param none
+   */
+  private void splashScreen ()
+  {
+    JPanel splashScreenPanel = new JPanel();
+    try 
+    {
+      img=ImageIO.read(new File("Graphics/LogoCorrectSize.jpg"));
+    }
+    catch (IOException e)
+    {
+    }
+    ImageIcon icon=new ImageIcon(img);
+    splashScreenPanel.setLayout(new FlowLayout());
+    
+    JLabel imageLabel=new JLabel();
+    imageLabel.setIcon(icon);
+    splashScreenPanel.add(imageLabel);
+    add (splashScreenPanel);
+    SwingUtilities.updateComponentTreeUI(this);
+    
+    try
+    {
+      Thread.sleep(1500);
+      remove (splashScreenPanel);
+    }
+    catch (InterruptedException ie)
+    {
+    }
+  }
+  
+  
+  /**
+   * makes the access levels screen, inclding the login screen
+   * Coded by Lucas
+   * @param welcome JLabel Instance of JLabel
+   * @param student JButton Instance of JButton
+   * @param teacher JButton Instance of JButton
+   * @param login JLabel Instance of JLabel
+   * @param username JLabel Instance of JLabel
+   * @param password JLabel Instance of JLabel
+   * @param signIn JButton Instance of JButton
+   * @param back JButton Instance of JButton
+   * @param openBindrPanel JPanel Instance of JPanel
+   * @param loginScreensPanel JPanel Instance of JPanel
+   */
+  public void accessLevels () 
+  {
+    JLabel welcome = new JLabel ("Welcome to Bindr!");
+    JButton student = new JButton ("Student");
+    JButton teacher = new JButton ("Teacher");
+    JLabel login = new JLabel ("Please enter your username and password.");
+    JLabel username = new JLabel ("Username: ");
+    JLabel password = new JLabel ("Password: ");
+    JButton signIn = new JButton ("Sign In");
+    JButton newAcc = new JButton ("New Account");
+    JButton back = new JButton ("Back");
+    
+    final JPanel openBindrPanel = new JPanel (null);
+    final JPanel loginScreensPanel = new JPanel (null);
+    
+    openBindrPanel.removeAll ();
+    openBindrPanel.validate ();
+    
+    welcome.setFont (new Font ("Arial", Font.PLAIN, 16)); 
+    welcome.setBounds (175, 0, 400, 50);
+    
+    student.setBounds (28, 65, 203, 203);
+    student.addActionListener (new ActionListener ()
+                                 {
+      /**
+       * runs when JButton Student is performed and
+       * manipulates the database JFrame by switching
+       * JPanels
+       * @param b BindrBook Instance of BindrBook
+       */
+      public void actionPerformed (ActionEvent e)
+      {
+        remove(cardLayoutPanel);
+        b = new BindrBook();
+        b.makeBook(false);
+        add(b);
+        validate();
+      }});
+    
+    teacher.setBounds (263, 65, 203, 203);
+    teacher.addActionListener (new ActionListener ()
+                                 {
+      /*
+       * runs when JButton Teacher is performed and
+       * manipulates the database JFrame by switching
+       * JPanels
+       */
+      public void actionPerformed (ActionEvent e)
+      {
+        cardLayoutPanel.add (loginScreensPanel, "LP");
+        cards.show (cardLayoutPanel, "LP");
+      }});
+    
+    openBindrPanel.add (welcome);
+    openBindrPanel.add (student);
+    openBindrPanel.add (teacher);
+    
+    loginScreensPanel.removeAll ();
+    loginScreensPanel.validate ();
+    
+    login.setFont (new Font ("Arial", Font.PLAIN, 16));
+    login.setBounds (95, 40, 300, 50);
+    
+    username.setFont (new Font ("Arial", Font.PLAIN, 16)); 
+    username.setBounds (85, 125, 100, 50);
+    usernameField.setBounds (180, 138, 200, 25);
+    
+    password.setFont (new Font ("Arial", Font.PLAIN, 16));
+    password.setBounds (85, 168, 100, 50);
+    passwordField.setBounds (180, 181, 200, 25);
+    
+    signIn.setBounds (378, 268, 100, 35);
+    signIn.addActionListener (new ActionListener ()
+                                {
+      /**
+       * Runs when JButton signIn is performed, and
+       * switches JPanels accordingly
+       */
+      public void actionPerformed (ActionEvent e)
+      {
+        if (canSignIn(usernameField.getText(),passwordField.getText()))
+        {
+          remove(cardLayoutPanel);
+          makeDatabaseApp ();
+          validate();
+        }
+      }});
+    
+    newAcc.setBounds (195, 268, 100, 35);
+    newAcc.addActionListener (new ActionListener()
+                                {
+      
+      public void actionPerformed (ActionEvent e)
+      {
+        u.printLogin(1,usernameField.getText(),null,passwordField.getText(),null);
+        remove(cardLayoutPanel);
+        makeDatabaseApp ();
+        validate();
+      }});
+    
+    back.setBounds (15, 268, 100, 35);
+    back.addActionListener (new ActionListener ( )
+                              {
+      public void actionPerformed (ActionEvent e)
+      {
+        cards.show (cardLayoutPanel, "OP");
+      }});
+    
+    loginScreensPanel.add (login);
+    loginScreensPanel.add (username);
+    loginScreensPanel.add (usernameField);
+    loginScreensPanel.add (password);
+    loginScreensPanel.add (passwordField);
+    loginScreensPanel.add (signIn);
+    loginScreensPanel.add (newAcc);
+    loginScreensPanel.add (back);
+    cardLayoutPanel.add (openBindrPanel, "OP");
+  }
+  
+  
+  protected boolean canSignIn (String userName, String passWord)
+  {
+    try
+    {
+      File loginFile = new File(".//TeacherLogin/teacherInfo.login");
+      BufferedReader input = new BufferedReader (new FileReader (loginFile));
+      
+      if (!input.readLine().equals ("EYESEEYES BINDR FILE"))
+        JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        int total = Integer.parseInt(input.readLine());
+        String u, p;
+        
+        for (int i=0; i<total; i++)
+        {
+          u = input.readLine();
+          p = input.readLine();
+          if (u.equals(userName) && p.equals(passWord))
+          {
+            currentUsername = userName;
+            currentPassword = passWord;
+            input.close();
+            return true;
+          }
+        }
+        JOptionPane.showMessageDialog (this, "Incorrect username or password", "?", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+    catch (IOException ioe)
+    {
+      System.out.println(ioe);
+      JOptionPane.showMessageDialog (this, "File not found", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    return false; 
+  }
+  
+  /**
+   * Makes the settings screen where the user can change their username and/or password.
+   * 
+   * @author Janelle Sookhai
+   * 
+   * @param newUsernameLabel - JLabel for the new username field.<br>
+   * @param currentPasswordLabel - JLabel for the current password password field.<br>
+   * @param newPasswordLabel - JLabel for the new password password field.<br>
+   * @param confirmNewPasswordLabel - JLabel for the second password password field. Intened to confirm the new password.<br>
+   * @param inputNewUsername - JTextField for the user to input their desired new username.<br>
+   * @param inputCurrentPassword - JPasswordField for the user to input their current password. Intened for users to only
+   * be able to change their own passwords.<br>
+   * @param inputNewPassword - JPasswordField for the user to input their desired new password.<br>
+   * @param inputConfirmNewPassword - JPasswordField for the user to input their desired new password a second time. Intended
+   * to confirm the user's new password.<br>
+   * 
+   */ 
+  public void accountSettings ()
+  {
+    u = new UserSettings(this);
+    remove(b);
+    validate();
+    
+    u.change(currentUsername, currentPassword);
+    add(u);
+    validate();
+  }
+  
+  public void deleteAccount()
+  {
+    u = new UserSettings(this);
+    remove(b);
+    validate();
+    
+    u.delete(currentUsername, currentPassword);
+    add(u);
+    validate();
+  }
+  
+  public  void exitSettings()
+  {
+    remove(u);
+    makeDatabaseApp ();
+    validate();
+  }
+  
+  /**
+   * makes the database app thing for teacher view. the one with the menus in it
+   * Coded by Angela Jeong and Janelle Sookhai
+   * @param newItem - JMenuItem for new.
+   * @param openItem - JMenuItem for open. 
+   * @param saveItem - JMenuItem for save.
+   * @param saveAsItem - JMenuItem for save as.
+   * @param quitItem - JMenuItem for quit.
+   * @param bindrBookItem - JMenuItem for bindr book.
+   * @param tableItem- JMenuItem for table.
+   * @param sortItem - JMenuItem for sort.
+   * @param searchItem - JMenuItem for search.
+   * @param accountSettingsItem - JMenuItem for account settings.
+   * @param deleteAccountItem - JMenuItem for delete account.
+   * @param helpItem - JMenuItem for help.
+   * @param fileMenu - JMenu for File.
+   * @param displayMenu - JMenu for Display.
+   * @param sortSearchMenu - JMenu for Sort/Search.
+   * @param settingsMenu - JMenu for Settings.
+   *@param helpMenu - JMenu for help.
+   * @param myMenus - JMenuBar for all menus to go onto.
+   */
+  private void makeDatabaseApp ()
+  {
+    b = new BindrBook();
+    b.makeBook(true);
+    add (b);
+    
+    JMenuItem newItem = new JMenuItem ("New");
+    JMenuItem openItem = new JMenuItem ("Open");
+    JMenuItem saveItem = new JMenuItem ("Save");
+    JMenuItem saveAsItem = new JMenuItem ("Save As");
+    JMenuItem printItem = new JMenuItem ("Print");
+    JMenuItem quitItem = new JMenuItem ("Quit");
+    JMenuItem bindrBookItem = new JMenuItem ("Bindr Book");
+    JMenuItem tableItem = new JMenuItem ("Table");
+    JMenuItem sortItem = new JMenuItem ("Sort");
+    JMenuItem searchItem = new JMenuItem ("Search");
+    JMenuItem accountSettingsItem = new JMenuItem ("Account Settings");
+    JMenuItem deleteAccountItem = new JMenuItem ("Delete Account");
+    JMenuItem helpItem = new JMenuItem ("Help");
+    
+    JMenu fileMenu = new JMenu ("File");
+    JMenu displayMenu = new JMenu ("Display");
+    JMenu sortSearchMenu = new JMenu ("Sort/Search");
+    JMenu settingsMenu  = new JMenu ("Settings");
+    JMenu helpMenu = new JMenu ("Help");
+    JMenuBar myMenus = new JMenuBar ();
+    
+    fileMenu.add (newItem);
+    fileMenu.add (openItem);
+    fileMenu.add (saveItem);
+    fileMenu.add (saveAsItem);
+    fileMenu.add (printItem);
+    fileMenu.add (quitItem);
+    displayMenu.add (bindrBookItem);
+    displayMenu.add (tableItem);
+    sortSearchMenu.add (sortItem);
+    sortSearchMenu.add(searchItem);
+    settingsMenu.add (accountSettingsItem);
+    settingsMenu.add(deleteAccountItem);
+    helpMenu.add (helpItem);
+    myMenus.add (fileMenu);
+    myMenus.add (displayMenu);
+    myMenus.add(sortSearchMenu);;
+    myMenus.add (settingsMenu);
+    myMenus.add (helpMenu);
+    setJMenuBar (myMenus);
+    
+    newItem.addActionListener (this);
+    openItem.addActionListener (this);
+    saveItem.addActionListener (this);
+    saveAsItem.addActionListener (this);
+    printItem.addActionListener (this);
+    quitItem.addActionListener (this);
+    bindrBookItem.addActionListener (this);
+    tableItem.addActionListener (this);
+    sortItem.addActionListener(this);
+    searchItem.addActionListener(this);
+    accountSettingsItem.addActionListener (this);
+    deleteAccountItem.addActionListener(this);
+    helpItem.addActionListener(this);
+    
+    SwingUtilities.updateComponentTreeUI(this);
+  }
+  
+  /**
+   * Makes the dialog for the sorts. 
+   * @author Angela Jeong.
+   * 
+   * @param d - JDialog that comes up when you want to sort. 
+   * @param label - JLabel for the sort options.
+   * @param firstButton - JRadioButton for the option to sort by first name. 
+   * @param lastButton - JRadioButton for the option to sort by last name.
+   * @param attendanceButton - JRadioButton for the option to sort by attendance.
+   * @param timeButton - JRadioButton for the option to sort by time. 
+   * @param reasonButton - JRadioButton for the option to sort by reason. 
+   * @param undoButton - JRadioButton for the option to undo a sort. 
+   */
+  private void makeSortDialog (final String type)
+  {
+    JDialog d = new JDialog (this, "Sort");
+    
+    d.setSize (250,125);
+    d.setResizable (false);
+    d.setLayout (new FlowLayout());
+    
+    JLabel label = new JLabel ("Sort By:");
+    group = new ButtonGroup ();
+    JRadioButton firstButton = new JRadioButton ("First Name");
+    firstButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.sort(0);
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton lastButton = new JRadioButton ("Last Name");
+    lastButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.sort(1);
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton attendanceButton = new JRadioButton ("Attendance");
+    attendanceButton.addActionListener (new ActionListener()
+                                          {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.sort(2);
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton timeButton = new JRadioButton ("Time");
+    timeButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.sort(3);
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton reasonButton = new JRadioButton ("Reason");
+    reasonButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.sort(4);
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton undoButton = new JRadioButton ("Undo");
+    undoButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        displayLayout(false,false);
+      }
+    });
+    
+    group.add(firstButton);
+    group.add(lastButton);
+    group.add(attendanceButton);
+    group.add(timeButton);
+    group.add(reasonButton);
+    group.add(undoButton);
+    
+    d.add(label);
+    d.add(firstButton);
+    d.add(lastButton);
+    d.add(attendanceButton);
+    d.add(timeButton);
+    d.add(reasonButton);
+    d.add(undoButton);
+    d.setLocationRelativeTo (this);
+    d.setVisible (true);
+  }
+  
+  /**
+   * Makes the dialog for the search. 
+   * @author Angela Jeong.
+   * 
+   * @param d - JDialog that comes up when you want to search. 
+   * @param matchLabel - JLabel for the search options.
+   * @param partialButton - JRadioButton for the option to do a partial search. 
+   * @param wholeButton - JRadioButton for the option to do oa full word search.
+   * @param fieldLabel  - Label outlining your search options. 
+   * @param firstButton - Label for the option to search by first name.
+   * @param lastButton - JRadioButton for the option to search by last name.
+   * @param attendanceButton - JRadioButton for the option to search by attendance.
+   * @param timeButton - JRadioButton for the option to search by time. 
+   * @param reasonButton - JRadioButton for the option to search by reason. 
+   */
+  private void makeSearchDialog()
+  {
+    JDialog d = new JDialog (this, "Search");
+    isWhole = true;
+    
+    d.setSize (300,200);
+    d.setResizable (false);
+    d.setLayout (new FlowLayout());
+    
+    JLabel matchLabel = new JLabel ("Search for:");
+    final JTextField text = new JTextField (20);
+    
+    settingsGroup = new ButtonGroup ();
+    JRadioButton partialButton = new JRadioButton ("Partial Match");
+    partialButton.setSelected(true);
+    partialButton.addActionListener (new ActionListener()
+                                       {
+      public void actionPerformed (ActionEvent e)
+      {
+        isWhole=false;
+      }
+    });
+    
+    JRadioButton wholeButton = new JRadioButton ("Match Whole Word");
+    wholeButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        isWhole=true;
+      }
+    });
+    
+    JLabel fieldLabel = new JLabel ("Search In:");
+    fieldGroup = new ButtonGroup ();
+    JRadioButton firstButton = new JRadioButton ("First Name");
+    firstButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(0,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton lastButton = new JRadioButton ("Last Name");
+    lastButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(1,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton attendanceButton = new JRadioButton ("Attendance");
+    attendanceButton.addActionListener (new ActionListener()
+                                          {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(2,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton timeButton = new JRadioButton ("Time");
+    timeButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(3,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton reasonButton = new JRadioButton ("Reason");
+    reasonButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(4,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    settingsGroup.add(partialButton);
+    settingsGroup.add(wholeButton);
+    
+    fieldGroup.add(firstButton);
+    fieldGroup.add(lastButton);
+    fieldGroup.add(timeButton);
+    fieldGroup.add(reasonButton);
+    
+    d.add(matchLabel);
+    d.add(text);
+    d.add(partialButton);
+    d.add(wholeButton);
+    d.add(fieldLabel);
+    d.add(firstButton);
+    d.add(lastButton);
+    d.add(timeButton);
+    d.add(reasonButton);
+    d.setLocationRelativeTo (this);
+    d.setVisible (true);
+  }
+  
+  /**
+   * Checks if the file is saved.
+   * 
+   * @param confirm - can either be yesor no will save accordingly.
+   */
+  private void checkIsSaved ()
+  {
+    int confirm;
+    
+    if (b.isSaved == false)
+    {
+      confirm = JOptionPane.showConfirmDialog (b, "The file you are currently on is not saved. Save this file?", "Unsaved File", JOptionPane.YES_NO_CANCEL_OPTION);
+      
+      if (confirm == JOptionPane.YES_OPTION)
+        b.saveFile(false, b.currentFile);
+      else
+      {
+        if (confirm == JOptionPane.NO_OPTION)
+          b.isSaved = true;
+      }
+    }
+  }
+  
+  /**
+   * Will either display the bindr book view or the table view.
+   */
+  private void displayLayout (boolean layout, boolean newTable)
+  {
+    b.removeAll();
+    if (layout)
+    {
+      b.makeBook(true);
+      b.displayBook(true);
+    }
+    else
+    {
+      if (newTable)
+        b.createData();
+      b.makeTable();
+    }
+    b.updateUI();
+  }
+  
+  
+  /**
+   * The actionPerformed method - performs specific tasks corresponding to the menu item selected by the user.
+   * @param e ActionEvent - stores user input from the class constructor.
+   */
+  public void actionPerformed (ActionEvent e)
+  {
+    if (e.getActionCommand ().equals ("Quit"))
+    {
+      System.exit (0);
+    }
+    
+    if (e.getActionCommand ().equals ("New"))
+    {
+      checkIsSaved();
+      if (b.isSaved)
+      {
+        b.newFile();
+        displayLayout(b.currentLayout,true);
+        setTitle("Untitled");
+        b.updateUI();
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Open"))
+    {
+      checkIsSaved();
+      if (b.isSaved)
+      {
+        b.openFile();
+        displayLayout(b.currentLayout,true);
+        setTitle(b.currentFile.getName());
+        b.updateUI();
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Save"))
+    {
+      if (b.students.isEmpty())
+        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        if (!b.currentLayout)
+          b.saveTable();
+        b.saveFile(false, b.currentFile);
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Save As"))
+    {
+      if (b.students.isEmpty())
+        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        if (!b.currentLayout)
+          b.saveTable();
+        b.saveAs();
+        setTitle(b.currentFile.getName());
+      }
+    }
+    if (e.getActionCommand().equals ("Print"))
+    {
+      {
+        BufferedImage printLogo;
+        Point logoPoint= new Point (220, 5);
+        StudentRecord st;
+        String printFirst,printLast,printTime,printAttendance;
+        Printer pr = new Printer();
+        try
+        {
+          printLogo = ImageIO.read(new File("Graphics/PrintLogo.jpg"));
+          pr.printImage(printLogo, logoPoint);
+        }
+        catch (IOException ie)
+        {
+        }
+        pr.println();
+        pr.println ("Student Name", "", "Time in/out");
+        pr.println();
+        pr.println();
+        for (int x = 0; x < b.students.size();x++)
+        {
+          st = b.students.get (x);
+          printFirst = st.getFirst();
+          printLast = st.getLast();
+          printTime = st.getTime();
+          printAttendance = st.getAttendance();
+          pr.println (printFirst,"",printAttendance);
+          pr.println (printLast,"",printTime);
+          pr.println();
+        }          
+        pr.printUsingDialog ();
+        
+      }
+    }
+    if (e.getActionCommand ().equals ("Bindr Book"))
+    {
+      if (b.students.size()!=0)
+        b.currentRecord=0;
+      displayLayout(true, true);
+    }
+    
+    if (e.getActionCommand ().equals ("Table"))
+    {
+      displayLayout(false, true);
+    }
+    
+    if (e.getActionCommand ().equals ("Sort"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSortDialog("Sort");
+    }
+    
+    if (e.getActionCommand ().equals ("Help"))
+    {
+      
+//messageDialog ("Refer to User Manual for help");
+// “...” indicates path of chm file
+      String progpath = new String ("hh.exe BinderHelpFile.chm ");
+      try
+      {
+        Runtime.getRuntime ( ).exec (progpath);
+      }
+      catch (IOException easasads)
+      {
+        JOptionPane.showMessageDialog(this, "Couldn't Find Help File.", "Error", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Search"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSearchDialog();
+    }
+    
+    else if (e.getActionCommand ().equals ("Account Settings"))
+    {
+      accountSettings();
+    }
+    
+    else if (e.getActionCommand().equals("Delete Account"))
+    {
+      deleteAccount();
+    }
+  }
+  
+  /**
+   * The main method - Creates a new instance of this class to run the program.
+   * <p>
+   * Blocks: <p>
+   * Block 1: Creates a new instance of this class.
+   * <p>
+   * @param args String[]
+   */
+  public static void main (String[] args)
+  {
+    new BindrDatabase();
+  } // main method
+}

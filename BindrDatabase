@@ -59,6 +59,8 @@ public class BindrDatabase extends JFrame implements ActionListener
    */
   public BindrDatabase()
   {
+    u = new UserSettings(this);
+    
     setSize (500, 350);
     setResizable(false);
     setLocationRelativeTo(null);
@@ -160,7 +162,7 @@ public class BindrDatabase extends JFrame implements ActionListener
       public void actionPerformed (ActionEvent e)
       {
         remove(cardLayoutPanel);
-        b = new BindrBook();
+        b = new BindrBook(currentUsername);
         b.makeBook(false);
         add(b);
         validate();
@@ -354,7 +356,7 @@ public class BindrDatabase extends JFrame implements ActionListener
    */
   private void makeDatabaseApp ()
   {
-    b = new BindrBook();
+    b = new BindrBook(currentUsername);
     b.makeBook(true);
     add (b);
     

@@ -204,7 +204,7 @@ public class BindrDatabase extends JFrame implements ActionListener
       {
         try
         {
-          PrintWriter newWriter = new PrintWriter(".//Users/"+usernameField.getText()+".user");
+          PrintWriter newWriter = new PrintWriter(".//Users/"+usernameField.getText()+"/UserFile.user");
           newWriter.println("EYESEEYES BINDR FILE");
           newWriter.println("0");
           newWriter.close();

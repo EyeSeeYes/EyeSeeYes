@@ -50,8 +50,11 @@ public class UserSettings extends JPanel
             JOptionPane.showMessageDialog (b, "Passwords do not match.", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
         else
+        {
           printLogin(0, currentUsername, inputNewUsername.getText(), currentPassword, inputNewPassword.getText());
-        b.exitSettings ();
+          JOptionPane.showMessageDialog (b, "Successfully changed account settings.");
+          b.exitSettings ();
+        }
       }
     });
     
@@ -67,6 +70,7 @@ public class UserSettings extends JPanel
     add (submitUserSettingsButton);
     validate();
   }
+  
   
   public void delete(final String currentUsername, final String currentPassword)
   {
@@ -94,7 +98,10 @@ public class UserSettings extends JPanel
           
           if (confirm==JOptionPane.OK_OPTION)
           {
+            File deleteFile = new File(".//Users/"+currentUsername+".user");
+            deleteFile.delete();
             printLogin(1,currentUsername,null,currentPassword,null);
+            JOptionPane.showMessageDialog (b, "Successfully deleted account.");
             System.exit(0);
           }
         }
@@ -107,11 +114,12 @@ public class UserSettings extends JPanel
     validate();
   }
   
+  
   public void printLogin(int method, String currentUsername, String newUsername, String currentPassword, String newPassword)
   {
     try
     {
-      File inputFile = new File (".//TeacherLogin/teacher info.login");
+      File inputFile = new File (".//TeacherLogin/teacherInfo.login");
       File tempFile = new File ("tempFile.login");
       
       BufferedReader br = new BufferedReader(new FileReader(inputFile));
@@ -154,12 +162,13 @@ public class UserSettings extends JPanel
           }
         }
         tempFile.renameTo(inputFile);
-        br.close();
+        // br.close();
         pw.close();
       }
     }
     catch (IOException ioe)
     {
+      System.out.println(ioe);
       JOptionPane.showMessageDialog (b, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
     }
   }

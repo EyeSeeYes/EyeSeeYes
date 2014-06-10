@@ -1,683 +1,709 @@
-//The "BindrBook" class.
+//The "DatabaseApp" class.
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
+import javax.imageio.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.JToolBar;
-import javax.swing.JFrame;
-import javax.swing.table.*;
-import java.util.*;
 import java.io.*;
 
-import java.util.Enumeration;
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.util.Calendar;
-
 /**
- * The class that handles most of the data and manipulation thereof. <p>
- * Creates a JPanel with buttons and text fields inside. <p>
- * The user can interact with the buttons and text fields to create, edit, delete, and move between records.
+ * The class that runs the program. <p>
+ * Creates a new instance of BindrBook and adds it to a window. <p>
  * @author Angela Jeong, Janelle Sookhai, Nathan Wolgelerenter, Lucas Lee.
- * @version 4.3, June 8, 2014
+ * @version 4.0, May 31, 2014
  */
-public class BindrBook extends JPanel implements ActionListener
+public class BindrDatabase extends JFrame implements ActionListener
 {
   /**
-   * The array list that stores all the records
+   * An instance of the BindrBook class to be added to this class.
    */
-  ArrayList <StudentRecord> students = new ArrayList <StudentRecord> (0);
-  /**
-   * The integer that represents the current record number.
-   */
-  static int currentRecord = -1;
-  /**
-   * The action command for the "Previoius" button.
-   */
-  static final private String PREVIOUS = "previous";
-  /**
-   * The action command for the "New" button.
-   */
-  static final private String NEW = "new";
-  /**
-   * The action command for the "Submit" button.
-   */
-  static final private String SUBMIT = "submit";
-  /**
-   * The action command for the "Delete" button.
-   */
-  static final private String DELETE = "delete";
-  /**
-   * The action command for the "Next" button.
-   */
-  static final private String NEXT = "next";
-  /**
-   * The text field which will receive input for the first name.
-   */
-  static JTextField inputFirstName;
-  /**
-   * The text field which will receive input or the last name.
-   */
-  static JTextField inputLastName;
+  BindrBook b;
+  UserSettings u;
   
-  static ButtonGroup signInOutGroup;
-  JRadioButton signInButton;
-  JRadioButton signOutButton;
-  JRadioButton absentButton;
+  BufferedImage img;
+  CardLayout cards = new CardLayout ();
+  JPanel cardLayoutPanel = new JPanel (cards);
   
-  static JTextField inputTime;
-  /**
-   * The text field which will receive input for the reason number.
-   */
-  static JTextField inputReason;
-  /**
-   * The label which will display the current record number and the total record number.
-   */
-  JLabel currentLabel;
-  /**
-   * The file that the program currently has opened.
-   */
-  File currentFile = new File("Untitled");
-  /**
-   * The boolean that checks whether the current data has been saved to a file.
-   */
-  boolean isSaved = true;
-  boolean currentLayout = true;
+  JTextField usernameField = new JTextField (); 
+  JPasswordField passwordField = new JPasswordField ();
+  String currentUsername, currentPassword;
   
-  JTable table;
-  DefaultTableModel model;
-  static JScrollPane scroll;
-  String[][] dataValues;
-  
-  StudentRecord s;
-  
-  Calendar cal;
-  DateFormat dateFormat;
+  ButtonGroup group, fieldGroup, settingsGroup;
+  boolean isWhole;
   
   /**
-   * The class constructor - Sets up the panel and tool bar and adds them to this JPanel.
-   * <p>
+   * The class constructor - Creates a new instance of BindrBook and adds it to a window.
+   * Coded by Angela
    * @param none
    */
-  public BindrBook()
+  public BindrDatabase()
   {
+    setSize (500, 350);
+    setResizable(false);
+    setLocationRelativeTo(null);
+    setDefaultCloseOperation (JFrame.DISPOSE_ON_CLOSE);
+    setVisible(true);
+    
+    try
+    {
+      splashScreen();
+    }
+    catch (Exception e)
+    {
+    }
+    accessLevels();
+    add(cardLayoutPanel);
+    
+    SwingUtilities.updateComponentTreeUI(this);
   }
   
   /**
-   * The makeBook method - makes the binder-view used when adding in new records.
-   * Coded by Janelle
-   * @param boolean isTeacher
+   * Makes the splash screen with the pretty logo on it. (Whoever made that logo is a great artist)
+   * Coded by Nathan
+   * @param none
    */
-  public void makeBook (final boolean isTeacher)
+  private void splashScreen ()
   {
-    setLayout (new BorderLayout ());
-    
-    JPanel p = new JPanel();
-    p.setLayout(new BoxLayout (p, BoxLayout.PAGE_AXIS));
-    
-    //JLabels for the text fields
-    JLabel firstName = new JLabel ("First Name:");
-    JLabel lastName = new JLabel ("Last Name:");
-    JLabel time = new JLabel ("Time:");
-    JLabel reason = new JLabel ("Reason:");
-    signInButton = new JRadioButton ("Sign In");
-    signOutButton = new JRadioButton ("Sign Out");
-    
-    //text fields
-    inputFirstName = new JTextField (15);
-    inputLastName = new JTextField (15);
-    inputTime = new JTextField (10);
-    inputReason = new JTextField (15);
-    
-    if (isTeacher)
+    JPanel splashScreenPanel = new JPanel();
+    try 
     {
-      currentLabel = new JLabel ("0 of 0");
-      p.add(currentLabel);
+      img=ImageIO.read(new File("Graphics/LogoCorrectSize.jpg"));
     }
-    
-    p.add (firstName, BorderLayout.LINE_START);
-    p.add (inputFirstName);
-    
-    p.add (lastName, BorderLayout.LINE_START);
-    p.add (inputLastName);
-    
-    p.add (signInButton, BorderLayout.LINE_START);
-    p.add (signOutButton);
-    
-    signInOutGroup = new ButtonGroup();
-    signInOutGroup.add (signInButton);
-    
-    signInOutGroup.add (signOutButton);
-    if (isTeacher)
+    catch (IOException e)
     {
-      absentButton = new JRadioButton ("Absent");
-      p.add (absentButton);
-      signInOutGroup.add (absentButton);
-      
-      p.add (time, BorderLayout.LINE_START);
-      p.add (inputTime);
     }
+    ImageIcon icon=new ImageIcon(img);
+    splashScreenPanel.setLayout(new FlowLayout());
     
-    p.add (reason, BorderLayout.LINE_START);
-    p.add (inputReason);
+    JLabel imageLabel=new JLabel();
+    imageLabel.setIcon(icon);
+    splashScreenPanel.add(imageLabel);
+    add (splashScreenPanel);
+    SwingUtilities.updateComponentTreeUI(this);
     
-    if (!isTeacher)
+    try
     {
-      JButton submitButton = new JButton ("Submit");
-      p.add (submitButton,BorderLayout.LINE_END);
-      submitButton.addActionListener(new ActionListener()
-                                       {
-        public void actionPerformed (ActionEvent e)
+      Thread.sleep(1500);
+      remove (splashScreenPanel);
+    }
+    catch (InterruptedException ie)
+    {
+    }
+  }
+  
+  
+  /**
+   * makes the access levels screen, inclding the login screen
+   * Coded by Lucas
+   * @param welcome JLabel Instance of JLabel
+   * @param student JButton Instance of JButton
+   * @param teacher JButton Instance of JButton
+   * @param login JLabel Instance of JLabel
+   * @param username JLabel Instance of JLabel
+   * @param password JLabel Instance of JLabel
+   * @param signIn JButton Instance of JButton
+   * @param back JButton Instance of JButton
+   * @param openBindrPanel JPanel Instance of JPanel
+   * @param loginScreensPanel JPanel Instance of JPanel
+   */
+  public void accessLevels () 
+  {
+    JLabel welcome = new JLabel ("Welcome to Bindr!");
+    JButton student = new JButton ("Student");
+    JButton teacher = new JButton ("Teacher");
+    JLabel login = new JLabel ("Please enter your username and password.");
+    JLabel username = new JLabel ("Username: ");
+    JLabel password = new JLabel ("Password: ");
+    JButton signIn = new JButton ("Sign In");
+    JButton back = new JButton ("Back");
+    
+    final JPanel openBindrPanel = new JPanel (null);
+    final JPanel loginScreensPanel = new JPanel (null);
+    
+    openBindrPanel.removeAll ();
+    openBindrPanel.validate ();
+    
+    welcome.setFont (new Font ("Arial", Font.PLAIN, 16)); 
+    welcome.setBounds (175, 0, 400, 50);
+    
+    student.setBounds (28, 65, 203, 203);
+    student.addActionListener (new ActionListener ()
+                                 {
+      /**
+       * runs when JButton Student is performed and
+       * manipulates the database JFrame by switching
+       * JPanels
+       * @param b BindrBook Instance of BindrBook
+       */
+      public void actionPerformed (ActionEvent e)
+      {
+        remove(cardLayoutPanel);
+        b = new BindrBook();
+        b.makeBook(false);
+        add(b);
+        validate();
+      }});
+    
+    teacher.setBounds (263, 65, 203, 203);
+    teacher.addActionListener (new ActionListener ()
+                                 {
+      /*
+       * runs when JButton Teacher is performed and
+       * manipulates the database JFrame by switching
+       * JPanels
+       */
+      public void actionPerformed (ActionEvent e)
+      {
+        cardLayoutPanel.add (loginScreensPanel, "LP");
+        cards.show (cardLayoutPanel, "LP");
+      }});
+    
+    openBindrPanel.add (welcome);
+    openBindrPanel.add (student);
+    openBindrPanel.add (teacher);
+    
+    loginScreensPanel.removeAll ();
+    loginScreensPanel.validate ();
+    
+    login.setFont (new Font ("Arial", Font.PLAIN, 16));
+    login.setBounds (95, 40, 300, 50);
+    
+    username.setFont (new Font ("Arial", Font.PLAIN, 16)); 
+    username.setBounds (85, 125, 100, 50);
+    usernameField.setBounds (180, 138, 200, 25);
+    
+    password.setFont (new Font ("Arial", Font.PLAIN, 16));
+    password.setBounds (85, 168, 100, 50);
+    passwordField.setBounds (180, 181, 200, 25);
+    
+    signIn.setBounds (378, 268, 100, 35);
+    signIn.addActionListener (new ActionListener ()
+                                {
+      /**
+       * Runs when JButton signIn is performed, and
+       * switches JPanels accordingly
+       */
+      public void actionPerformed (ActionEvent e)
+      {
+        if (canSignIn(usernameField.getText(),passwordField.getText()))
         {
-//          submitStudentRecord();
-        }});
-    }
+          remove(cardLayoutPanel);
+          makeDatabaseApp ();
+          validate();
+        }
+      }});
     
-    setFont(new Font ("Helvetica" , Font.PLAIN , 16));
+    back.setBounds (15, 268, 100, 35);
+    back.addActionListener (new ActionListener ( )
+                              {
+      public void actionPerformed (ActionEvent e)
+      {
+        cards.show (cardLayoutPanel, "OP");
+      }});
     
-    if (isTeacher)
-    {
-      JToolBar toolBar = new JToolBar ("Still draggable");
-      toolBar.setLayout (new FlowLayout (FlowLayout.CENTER));
-      addButtons (toolBar);
-      add (toolBar, BorderLayout.PAGE_END);
-    }
-    p.revalidate();
-    add (p, BorderLayout.CENTER);
-    
-    currentLayout = true;
-    displayBook(isTeacher);
+    loginScreensPanel.add (login);
+    loginScreensPanel.add (username);
+    loginScreensPanel.add (usernameField);
+    loginScreensPanel.add (password);
+    loginScreensPanel.add (passwordField);
+    loginScreensPanel.add (signIn);
+    loginScreensPanel. add (back);
+    cardLayoutPanel.add (openBindrPanel, "OP");
   }
   
   
-  private void submitTeacherRecord()
-  {
-    String first = inputFirstName.getText();
-    String last = inputLastName.getText();
-    String attendance = getSelectedButtonText(signInOutGroup);
-    String time = inputTime.getText();
-    
-    s = new StudentRecord (first, last, attendance, time, inputReason.getText());
-    
-    if (currentRecord==-1)
-      students.add(s);
-    else
-      students.set(currentRecord,s);
-    
-    if (!first.isEmpty())
-      s.setFirst(first);
-    if (!last.isEmpty())
-      s.setLast(last);
-    if (!attendance.isEmpty())
-      s.setAttendance(attendance);
-    if (!time.isEmpty())
-      s.setTime(time);
-  }
-  
-  
-  private void submitStudentRecord(String teacher, String first, String last, String attendance, String reason)
+  protected boolean canSignIn (String userName, String passWord)
   {
     try
     {
-      File teacherFile = new File(".//Users/"+teacher+".user");
-      File tempFile = new File ("tempFile.user");
-      cal = Calendar.getInstance();
+      File loginFile = new File(".//TeacherLogin/teacherInfo.login");
+      BufferedReader input = new BufferedReader (new FileReader (loginFile));
       
-      BufferedReader br = new BufferedReader(new FileReader(teacherFile));
-      PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
-      
-      if (!br.readLine().equals ("EYESEEYES BINDR FILE"))
+      if (!input.readLine().equals ("EYESEEYES BINDR FILE"))
         JOptionPane.showMessageDialog (this, "File cannot be read", "Error", JOptionPane.ERROR_MESSAGE);
       else
       {
-        pw.println("EYESEEYES BINDR FILE");
+        int total = Integer.parseInt(input.readLine());
+        String u, p;
         
-        int total = Integer.parseInt(br.readLine());
-        total++;
-        pw.println(total);
-        
-        for (int i=0; i<total*5; i++)
-          pw.println(br.readLine());
-        
-        pw.println(first);
-        pw.println(last);
-        pw.println(attendance);
-        pw.println(dateFormat.format(cal.getTime()).toString());
-        pw.println(reason);
-        
-        tempFile.renameTo(teacherFile);
-        pw.close();
+        for (int i=0; i<total; i++)
+        {
+          u = input.readLine();
+          p = input.readLine();
+          if (u.equals(userName) && p.equals(passWord))
+          {
+            currentUsername = userName;
+            currentPassword = passWord;
+            input.close();
+            return true;
+          }
+        }
+        JOptionPane.showMessageDialog (this, "Incorrect username or password", "?", JOptionPane.ERROR_MESSAGE);
       }
     }
     catch (IOException ioe)
     {
-      JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
+      System.out.println(ioe);
+      JOptionPane.showMessageDialog (this, "File not found", "Error", JOptionPane.ERROR_MESSAGE);
     }
+    return false; 
   }
   
-  
-  public String getSelectedButtonText(ButtonGroup signInOutGroup) 
+  /**
+   * Makes the settings screen where the user can change their username and/or password.
+   * 
+   * @author Janelle Sookhai
+   * 
+   * @param newUsernameLabel - JLabel for the new username field.<br>
+   * @param currentPasswordLabel - JLabel for the current password password field.<br>
+   * @param newPasswordLabel - JLabel for the new password password field.<br>
+   * @param confirmNewPasswordLabel - JLabel for the second password password field. Intened to confirm the new password.<br>
+   * @param inputNewUsername - JTextField for the user to input their desired new username.<br>
+   * @param inputCurrentPassword - JPasswordField for the user to input their current password. Intened for users to only
+   * be able to change their own passwords.<br>
+   * @param inputNewPassword - JPasswordField for the user to input their desired new password.<br>
+   * @param inputConfirmNewPassword - JPasswordField for the user to input their desired new password a second time. Intended
+   * to confirm the user's new password.<br>
+   * 
+   */ 
+  public void accountSettings ()
   {
-    for (Enumeration<AbstractButton> buttons = signInOutGroup.getElements(); buttons.hasMoreElements();) 
-    {
-      AbstractButton button = buttons.nextElement();
-      
-      if (button.isSelected()) 
+    u = new UserSettings(this);
+    remove(b);
+    validate();
+    
+    u.change(currentUsername, currentPassword);
+    add(u);
+    validate();
+  }
+  
+  public void deleteAccount()
+  {
+    u = new UserSettings(this);
+    remove(b);
+    validate();
+    
+    u.delete(currentUsername, currentPassword);
+    add(u);
+    validate();
+  }
+  
+  public  void exitSettings()
+  {
+    remove(u);
+    makeDatabaseApp ();
+    validate();
+  }
+  
+  /**
+   * makes the database app thing for teacher view. the one with the menus in it
+   * Coded by Angela
+   * @param none
+   */
+  private void makeDatabaseApp ()
+  {
+    b = new BindrBook();
+    b.makeBook(true);
+    add (b);
+    
+    JMenuItem newItem = new JMenuItem ("New");
+    JMenuItem openItem = new JMenuItem ("Open");
+    JMenuItem saveItem = new JMenuItem ("Save");
+    JMenuItem saveAsItem = new JMenuItem ("Save As");
+    JMenuItem quitItem = new JMenuItem ("Quit");
+    JMenuItem bindrBookItem = new JMenuItem ("Bindr Book");
+    JMenuItem tableItem = new JMenuItem ("Table");
+    JMenuItem sortItem = new JMenuItem ("Sort");
+    JMenuItem searchItem = new JMenuItem ("Search");
+    JMenuItem accountSettingsItem = new JMenuItem ("Account Settings");
+    JMenuItem deleteAccountItem = new JMenuItem ("Delete Account");
+    
+    JMenu fileMenu = new JMenu ("File");
+    JMenu displayMenu = new JMenu ("Display");
+    JMenu sortSearchMenu = new JMenu ("Sort/Search");
+    JMenu settingsMenu  = new JMenu ("Settings");
+    JMenuBar myMenus = new JMenuBar ();
+    
+    fileMenu.add (newItem);
+    fileMenu.add (openItem);
+    fileMenu.add (saveItem);
+    fileMenu.add (saveAsItem);
+    fileMenu.add (quitItem);
+    displayMenu.add (bindrBookItem);
+    displayMenu.add (tableItem);
+    sortSearchMenu.add (sortItem);
+    sortSearchMenu.add(searchItem);
+    settingsMenu.add (accountSettingsItem);
+    settingsMenu.add(deleteAccountItem);
+    myMenus.add (fileMenu);
+    myMenus.add (displayMenu);
+    myMenus.add(sortSearchMenu);;
+    myMenus.add (settingsMenu);
+    setJMenuBar (myMenus);
+    
+    newItem.addActionListener (this);
+    openItem.addActionListener (this);
+    saveItem.addActionListener (this);
+    saveAsItem.addActionListener (this);
+    quitItem.addActionListener (this);
+    bindrBookItem.addActionListener (this);
+    tableItem.addActionListener (this);
+    sortItem.addActionListener(this);
+    searchItem.addActionListener(this);
+    accountSettingsItem.addActionListener (this);
+    deleteAccountItem.addActionListener(this);
+    
+    SwingUtilities.updateComponentTreeUI(this);
+  }
+  
+  private void makeSortDialog (final String type)
+  {
+    JDialog d = new JDialog (this, "Sort");
+    
+    d.setSize (250,125);
+    d.setResizable (false);
+    d.setLayout (new FlowLayout());
+    
+    JLabel label = new JLabel ("Sort By:");
+    group = new ButtonGroup ();
+    JRadioButton firstButton = new JRadioButton ("First Name");
+    firstButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
       {
-        return button.getText();
+        b.createData();
+        b.sort(0);
+        displayLayout(false,false);
       }
-    }
-    return null;
-  }
-  
-  
-  protected void addButtons (JToolBar toolBar)
-  {
-    JButton button = null;
+    });
     
-    button = makeButton ("Back", PREVIOUS, "Back to previous record");
-    toolBar.add (button);
-    
-    button = makeButton ("New", NEW, "Create a new record");
-    toolBar.add (button);
-    
-    button = makeButton ("Submit", SUBMIT, "Submits a record");
-    toolBar.add (button);
-    
-    button = makeButton ("Delete", DELETE, "Delete record");
-    toolBar.add (button);
-    
-    button = makeButton ("Forward", NEXT, "Forward to next record");
-    toolBar.add (button);
-  }
-  
-  protected JButton makeButton (String imageName, String actionCommand, String toolTipText)
-  {
-    Image imageGIF = Toolkit.getDefaultToolkit ().getImage ("Graphics/" + imageName + ".gif");
-    JButton button = new JButton ();
-    
-    button.setToolTipText (toolTipText);
-    button.setIcon (new ImageIcon (imageGIF));
-    button.setActionCommand (actionCommand);
-    button.addActionListener (this);
-    
-    return button;
-  }
-  
-  
-  public void makeTable ()
-  {
-    setLayout (new BorderLayout ());
-    
-    String[] columnNames = {"First Name" , "Last Name" , "In/Out/Absent" , "Time" , "Reason"};
-//    String[][] tempValues = {{"Angela", "Jeong", "2:30", "Sign In", "Because"},
-//      {"Lucas", "Lee", "3:00", "Sign Out", "Why not"},
-//      {"Janelle", "Sookhai", "2:00", "Sign In", "Early"},
-//      {"Nathan", "Can't Spell", "--", "Absent", "Skipped?"}};
-    
-    Color lightBlue = new Color (175, 229, 240); //light blue color for the text
-    Color lightPink = new Color (247, 190, 214); //light pink color for the background
-    Color lightPurple = new Color (210, 175, 227); //light purple color for the grid lines
-    
-    model = new DefaultTableModel (dataValues , columnNames);
-    table = new JTable (model);
-    
-    table.setRowHeight (20);
-    table.setShowVerticalLines (true);
-    table.setShowHorizontalLines (true);
-    
-    table.setSelectionForeground (Color.green);
-    table.setSelectionBackground (Color.red);
-    table.setGridColor (Color.blue);
-    table.setVisible(true);
-    
-    table.getModel().addTableModelListener(new TableModelListener(){
-      @Override
-      public void tableChanged(TableModelEvent e) 
+    JRadioButton lastButton = new JRadioButton ("Last Name");
+    lastButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
       {
-        TableModel model = (TableModel)e.getSource();
-        int rNum = table.getSelectedRow();
-        String first = (String)model.getValueAt(rNum,0);
-        String last = (String)model.getValueAt(rNum,1);
-        String attendance = (String)model.getValueAt(rNum,2);
-        String time = (String)model.getValueAt(rNum,3);
-        
-        StudentRecord s = new StudentRecord(first,last,attendance,time,(String)model.getValueAt(rNum,4));
-        students.set(rNum,s);
-        
-        if(!first.isEmpty())
-          s.setFirst(first);
-        if (!last.isEmpty())
-          s.setLast(last);
-        if (!attendance.isEmpty())
-          s.setAttendance(attendance);
-        if (!time.isEmpty())
-          s.setTime(time);
-      }});
+        b.createData();
+        b.sort(1);
+        displayLayout(false,false);
+      }
+    });
     
-    scroll = new JScrollPane (table);
-    add (scroll, BorderLayout.CENTER);
+    JRadioButton attendanceButton = new JRadioButton ("Attendance");
+    attendanceButton.addActionListener (new ActionListener()
+                                          {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.sort(2);
+        displayLayout(false,false);
+      }
+    });
     
-    currentLayout = false;
+    JRadioButton timeButton = new JRadioButton ("Time");
+    timeButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.sort(3);
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton reasonButton = new JRadioButton ("Reason");
+    reasonButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.sort(4);
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton undoButton = new JRadioButton ("Undo");
+    undoButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        displayLayout(false,false);
+      }
+    });
+    
+    group.add(firstButton);
+    group.add(lastButton);
+    group.add(attendanceButton);
+    group.add(timeButton);
+    group.add(reasonButton);
+    group.add(undoButton);
+    
+    d.add(label);
+    d.add(firstButton);
+    d.add(lastButton);
+    d.add(attendanceButton);
+    d.add(timeButton);
+    d.add(reasonButton);
+    d.add(undoButton);
+    d.setLocationRelativeTo (this);
+    d.setVisible (true);
   }
   
-  public void createData ()
+  
+  private void makeSearchDialog()
   {
-    dataValues = new String [students.size()] [5];
+    JDialog d = new JDialog (this, "Search");
+    isWhole = true;
     
-    for (int y = 0; y < students.size(); y++)
+    d.setSize (300,200);
+    d.setResizable (false);
+    d.setLayout (new FlowLayout());
+    
+    JLabel matchLabel = new JLabel ("Search for:");
+    final JTextField text = new JTextField (20);
+    
+    settingsGroup = new ButtonGroup ();
+    JRadioButton partialButton = new JRadioButton ("Partial Match");
+    partialButton.setSelected(true);
+    partialButton.addActionListener (new ActionListener()
+                                       {
+      public void actionPerformed (ActionEvent e)
+      {
+        isWhole=false;
+      }
+    });
+    
+    JRadioButton wholeButton = new JRadioButton ("Match Whole Word");
+    wholeButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        isWhole=true;
+      }
+    });
+    
+    JLabel fieldLabel = new JLabel ("Search In:");
+    fieldGroup = new ButtonGroup ();
+    JRadioButton firstButton = new JRadioButton ("First Name");
+    firstButton.addActionListener (new ActionListener()
+                                     {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(0,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton lastButton = new JRadioButton ("Last Name");
+    lastButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(1,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton attendanceButton = new JRadioButton ("Attendance");
+    attendanceButton.addActionListener (new ActionListener()
+                                          {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(2,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton timeButton = new JRadioButton ("Time");
+    timeButton.addActionListener (new ActionListener()
+                                    {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(3,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    JRadioButton reasonButton = new JRadioButton ("Reason");
+    reasonButton.addActionListener (new ActionListener()
+                                      {
+      public void actionPerformed (ActionEvent e)
+      {
+        b.createData();
+        b.search(4,isWhole,text.getText());
+        displayLayout(false,false);
+      }
+    });
+    
+    settingsGroup.add(partialButton);
+    settingsGroup.add(wholeButton);
+    
+    fieldGroup.add(firstButton);
+    fieldGroup.add(lastButton);
+    fieldGroup.add(timeButton);
+    fieldGroup.add(reasonButton);
+    
+    d.add(matchLabel);
+    d.add(text);
+    d.add(partialButton);
+    d.add(wholeButton);
+    d.add(fieldLabel);
+    d.add(firstButton);
+    d.add(lastButton);
+    d.add(timeButton);
+    d.add(reasonButton);
+    d.setLocationRelativeTo (this);
+    d.setVisible (true);
+  }
+  
+  private void checkIsSaved ()
+  {
+    int confirm;
+    
+    if (b.isSaved == false)
     {
-      dataValues [y][0] = students.get(y).getFirst();
-      dataValues [y][1] = students.get(y).getLast();
-      dataValues [y][2] = students.get(y).getAttendance();
-      dataValues [y][3] = students.get(y).getTime();
-      dataValues [y][4] = students.get(y).getReason();
-    }
-  }
-  
-  public void saveTable()
-  {
-    StudentRecord s;
-    students.clear();
-    for (int i=0; i<dataValues.length; i++)
-    {
-      s = new StudentRecord (dataValues[i][0],dataValues[i][1],dataValues[i][2],dataValues[i][3],dataValues[i][4]);
-      students.add(s);
+      confirm = JOptionPane.showConfirmDialog (b, "The file you are currently on is not saved. Save this file?", "Unsaved File", JOptionPane.YES_NO_CANCEL_OPTION);
       
-      // if (!dataValues[i][0].isEmpty())
-      s.setFirst(dataValues[i][0]);
-      if (!dataValues[i][1].isEmpty())
-        s.setLast(dataValues[i][1]);
-      if (!dataValues[i][2].isEmpty())
-        s.setAttendance(dataValues[i][2]);
-      if (!dataValues[i][3].isEmpty())
-        s.setTime(dataValues[i][3]);
-    }
-  }
-  
-  public void sort(int field)
-  {
-    int[] array = new int[students.size()];
-    array = SortSearch.sort(field, dataValues);
-    
-    dataValues = new String [array.length][5];
-    for (int y=0; y<array.length; y++)
-    {
-      dataValues [y][0] = students.get(array[y]).getFirst();
-      dataValues [y][1] = students.get(array[y]).getLast();
-      dataValues [y][2] = students.get(array[y]).getAttendance();
-      dataValues [y][3] = students.get(array[y]).getTime();
-      dataValues [y][4] = students.get(array[y]).getReason();
-    }
-  }
-  
-  public void search(int field, boolean isWhole, String match)
-  {
-    ArrayList<Integer> array = new ArrayList<>();
-    array = SortSearch.search(field, isWhole, match, dataValues);
-    
-    dataValues = new String [array.size()][5];
-    for (int y=0; y<array.size(); y++)
-    {
-      dataValues [y][0] = students.get(array.get(y)).getFirst();
-      dataValues [y][1] = students.get(array.get(y)).getLast();
-      dataValues [y][2] = students.get(array.get(y)).getAttendance();
-      dataValues [y][3] = students.get(array.get(y)).getTime();
-      dataValues [y][4] = students.get(array.get(y)).getReason();
-    }
-  }
-  
-  private JFileChooser makeFileChooser(String fileName)
-  {
-    JFileChooser fc = new JFileChooser (".//Files");
-    
-    fc.setFileSelectionMode (JFileChooser.FILES_ONLY);
-    fc.setFileFilter(new ExampleFileFilter("bndr", "EYESEEYES BINDR FILE"));
-    fc.setSelectedFile(new File(fileName));
-    
-    return fc;
-  }
-  
-  /**
-   * Creates a new file.
-   * @param none
-   */
-  public void newFile()
-  {
-    currentFile = new File("Untitled");
-    students.clear();
-    currentRecord = -1;
-  }
-  
-  /**
-   * Opens an existing file.
-   * @param none
-   */
-  public void openFile ()
-  {
-    JFileChooser fc = makeFileChooser(currentFile.getName().toString());
-    
-    int result = fc.showOpenDialog (this);
-    if (result == JFileChooser.APPROVE_OPTION)
-    {
-      File file = fc.getSelectedFile();
-      String name = file.getName();
-      
-      if (file == null || name.equals ("") || name.length () > 255)
-        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
-      
-      else if (!name.substring(name.length()-4).equalsIgnoreCase("bndr"))
-        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
-      
-      else if (file.length()==0)
-        JOptionPane.showMessageDialog (this, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
-      
+      if (confirm == JOptionPane.YES_OPTION)
+        b.saveFile(false, b.currentFile);
       else
       {
-        try
-        {
-          BufferedReader br = new BufferedReader (new FileReader (file));
-          
-          if (!br.readLine().equals("EYESEEYES BINDR FILE"))
-            JOptionPane.showMessageDialog(this, "Invalid File Header", "Invalid File Header", JOptionPane.ERROR_MESSAGE);
-          
-          else
-          {
-            students.clear();
-            int t = Integer.parseInt(br.readLine());
-            
-            for (int i=0; i<t; i++)
-            {
-              StudentRecord p = new StudentRecord (br.readLine(),br.readLine(),br.readLine(),br.readLine(),br.readLine());
-              students.add(i,p);
-            }
-            
-            currentFile = file;
-            currentRecord = 0;
-          }
-        }
-        
-        catch (IOException e)
-        {
-          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
-        
-        catch (NumberFormatException e)
-        {
-          JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
+        if (confirm == JOptionPane.NO_OPTION)
+          b.isSaved = true;
       }
     }
   }
   
-  /**
-   * Saves the inputted data to the current file.
-   * @param none
-   */
-  public void saveFile(boolean isSaveAs, File fileName)
+  
+  private void displayLayout (boolean layout, boolean newTable)
   {
-    if (isSaveAs==false && currentFile.getName().equals("Untitled"))
+    b.removeAll();
+    if (layout)
     {
-      int confirm = JOptionPane.showConfirmDialog (this, "This is an Untitled File. Give it a title?", "Untitled File", JOptionPane.OK_CANCEL_OPTION);
-      if (confirm == JOptionPane.OK_OPTION)
-        saveAs();
+      b.makeBook(true);
+      b.displayBook(true);
     }
-    
     else
     {
-      try
-      {
-        PrintWriter pw = new PrintWriter (new FileWriter (fileName));
-        
-        pw.println("EYESEEYES BINDR FILE");
-        pw.println(students.size());
-        
-        for (int i=0;i<students.size();i++)
-        {
-          pw.println(students.get(i).getFirst());
-          pw.println(students.get(i).getLast());
-          pw.println(students.get(i).getAttendance());
-          pw.println(students.get(i).getTime());
-          pw.println(students.get(i).getReason());
-        }
-        
-        pw.close();
-        isSaved = true;
-      }
-      
-      catch (IOException e)
-      {
-        JOptionPane.showMessageDialog (this, "Error", "ERROR", JOptionPane.ERROR_MESSAGE);
-      }
+      if (newTable)
+        b.createData();
+      b.makeTable();
     }
+    b.updateUI();
   }
   
-  /**
-   * Saves the inputted data to a new or exisiting file.
-   * @param none
-   */
-  public void saveAs ()
-  {
-    JFileChooser fc = makeFileChooser("Untitled");
-    
-    int result = fc.showSaveDialog(this);
-    if (result == JFileChooser.APPROVE_OPTION)
-    {
-      File file = new File(fc.getSelectedFile()+".bndr");
-      String name = file.getName();
-      
-      if (file == null || name.equals ("") || name.length () > 255)
-        JOptionPane.showMessageDialog (this, "Invalid File Name", "Invalid File Name", JOptionPane.ERROR_MESSAGE);
-      
-      else if (!name.substring(name.length()-4).equalsIgnoreCase("bndr"))
-        JOptionPane.showMessageDialog(this, "Invalid File Extension", "Invalid File Extension", JOptionPane.ERROR_MESSAGE);
-      
-      else
-        saveFile(true, file);
-    }
-  }
   
   /**
-   * Performs specific tasks for each button the user selects.
-   * @param e ActionEvent
+   * The actionPerformed method - performs specific tasks corresponding to the menu item selected by the user.
+   * @param e ActionEvent - stores user input from the class constructor.
    */
   public void actionPerformed (ActionEvent e)
   {
-    String cmd = e.getActionCommand ();
-    
-    if (PREVIOUS.equals (cmd))
+    if (e.getActionCommand ().equals ("Quit"))
     {
-      if (students.size()!=0)
+      System.exit (0);
+    }
+    
+    if (e.getActionCommand ().equals ("New"))
+    {
+      checkIsSaved();
+      if (b.isSaved)
       {
-        if (currentRecord <= 0)
-          currentRecord = students.size()-1;
-        else
-          currentRecord--;
+        b.newFile();
+        displayLayout(b.currentLayout,true);
+        setTitle("Untitled");
+        b.updateUI();
       }
     }
     
-    else if (NEXT.equals (cmd))
+    if (e.getActionCommand ().equals ("Open"))
     {
-      if (students.size()!=0)
+      checkIsSaved();
+      if (b.isSaved)
       {
-        if (currentRecord == students.size()-1)
-          currentRecord = 0;
-        else
-          currentRecord++;
+        b.openFile();
+        displayLayout(b.currentLayout,true);
+        setTitle(b.currentFile.getName());
+        b.updateUI();
       }
     }
     
-    else if (NEW.equals (cmd))
+    if (e.getActionCommand ().equals ("Save"))
     {
-      currentRecord = -1;
-    }
-    
-    else if (SUBMIT.equals (cmd))
-    {
-      submitTeacherRecord();
-    }
-    else
-    {
-      if (DELETE.equals (cmd))
+      if (b.students.isEmpty())
+        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      else
       {
-        if (students.size()!=0)
-        {
-          if (currentRecord==-1)
-            currentRecord=0;
-          else
-          {
-            students.remove(currentRecord);
-            currentRecord--;
-            isSaved = false;
-          }
-        }
+        if (!b.currentLayout)
+          b.saveTable();
+        b.saveFile(false, b.currentFile);
       }
     }
-    displayBook (true);
+    
+    if (e.getActionCommand ().equals ("Save As"))
+    {
+      if (b.students.isEmpty())
+        JOptionPane.showMessageDialog (b, "Empty File", "Empty File", JOptionPane.ERROR_MESSAGE);
+      else
+      {
+        if (!b.currentLayout)
+          b.saveTable();
+        b.saveAs();
+        setTitle(b.currentFile.getName());
+      }
+    }
+    
+    if (e.getActionCommand ().equals ("Bindr Book"))
+    {
+      if (b.students.size()!=0)
+        b.currentRecord=0;
+      displayLayout(true, true);
+    }
+    
+    if (e.getActionCommand ().equals ("Table"))
+    {
+      displayLayout(false, true);
+    }
+    
+    if (e.getActionCommand ().equals ("Sort"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSortDialog("Sort");
+    }
+    
+    if (e.getActionCommand ().equals ("Search"))
+    {
+      if (b.currentLayout)
+        displayLayout(false,true);
+      makeSearchDialog();
+    }
+    
+    else if (e.getActionCommand ().equals ("Account Settings"))
+    {
+      accountSettings();
+    }
+    
+    else if (e.getActionCommand().equals("Delete Account"))
+    {
+      deleteAccount();
+    }
   }
   
   /**
-   * Updates the text on all the text fields and label after a button was selected by the user.
-   * @param isTeacher boolean
+   * The main method - Creates a new instance of this class to run the program.
+   * <p>
+   * Blocks: <p>
+   * Block 1: Creates a new instance of this class.
+   * <p>
+   * @param args String[]
    */
-  protected void displayBook (boolean isTeacher)
+  public static void main (String[] args)
   {
-    if (currentRecord == -1)
-    {
-      inputFirstName.setText("");
-      inputLastName.setText("");
-      inputReason.setText("");
-      signInButton.setSelected(true);
-      if (isTeacher)
-      {
-        cal = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("hh:mm a");
-        inputTime.setText(dateFormat.format(cal.getTime()).toString());
-      }
-    }
-    
-    else
-    {
-      inputFirstName.setText(students.get(currentRecord).getFirst());
-      inputLastName.setText(students.get(currentRecord).getLast());
-      String attendance = students.get(currentRecord).getAttendance();
-      if (attendance.equals("Sign In"))
-        signInButton.setSelected(true);
-      else if (attendance.equals("Sign Out"))
-        signOutButton.setSelected(true);
-      else if (attendance.equals("Absent"))
-        absentButton.setSelected(true);
-      else
-        signInOutGroup.clearSelection();
-      if (isTeacher)
-        inputTime.setText(students.get(currentRecord).getTime());
-      inputReason.setText(students.get(currentRecord).getReason());
-    }
-    
-    if (isTeacher)
-      currentLabel.setText((currentRecord+1) + " of " + students.size());
-    updateUI();
-  }
+    new BindrDatabase();
+  } // main method
 }

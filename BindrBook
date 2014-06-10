@@ -94,6 +94,10 @@ public class BindrBook extends JPanel implements ActionListener
    */
   File currentFile = new File("Untitled");
   /**
+  * The current user of the program.
+  */
+  String currentUser;
+  /**
    * The boolean that checks whether the current data has been saved to a file.
    */
   boolean isSaved = true;
@@ -130,13 +134,15 @@ public class BindrBook extends JPanel implements ActionListener
    */
   DateFormat dateFormat;
   
+
   /**
-   * The class constructor - Sets up the panel and tool bar and adds them to this JPanel.
+   * The class constructor - The current user variable is passed in from BindrDatabase.
    * <p>
-   * @param none
+   * @param user String The current user's username.
    */
-  public BindrBook()
+  public BindrBook(String user)
   {
+     currentUser = user;
   }
   
   /**
@@ -551,7 +557,7 @@ public class BindrBook extends JPanel implements ActionListener
   
   private JFileChooser makeFileChooser(String fileName)
   {
-    JFileChooser fc = new JFileChooser (".//Files");
+    JFileChooser fc = new JFileChooser (".//"+currentUser);
     
     fc.setFileSelectionMode (JFileChooser.FILES_ONLY);
     fc.setFileFilter(new ExampleFileFilter("bndr", "EYESEEYES BINDR FILE"));
